@@ -1,101 +1,93 @@
 
-# **Manual Installation Guide: DevOps Toolchain for Windows**
+## **📋 Reikalavimai**
 
-This document outlines the manual installation steps for **Git**, **Terraform**, **Terragrunt**, and **Google Cloud SDK (gcloud CLI)** on Windows. This method does not require package managers (like Chocolatey) and allows for precise control over versioning and binary locations.
-
-## **📋 Prerequisites**
-
-* Windows 10 or Windows 11  
-* Administrator privileges
+* „Windows 10“ arba „Windows 11“  
+* Administratoriaus teisės
 
 ---
 
-## **1\. Install Git**
+## **1\. „Git“ diegimas**
 
-1. Navigate to the [official Git website](https://git-scm.com/download/win).  
-2. Download the **64-bit Git for Windows Setup**.  
-3. Run the installer.  
-4. **Note:** You can generally accept all default settings by clicking "Next" through the wizard.
-
----
-
-## **2\. Setup Binary Directory (Terraform & Terragrunt)**
-
-Since Terraform and Terragrunt are distributed as single binaries, we will create a dedicated location for them.
-
-1. Open File Explorer.  
-2. Create a folder on your C: drive (or preferred drive) named DevOps.  
-   * **Path:** C:\\DevOps
-
-### **Install Terraform**
-
-1. Go to the [Terraform Downloads page](https://developer.hashicorp.com/terraform/install).  
-2. Select **Windows** and download the **AMD64** ZIP file.  
-3. Extract the terraform.exe file from the ZIP.  
-4. Move terraform.exe into C:\\DevOps.
-
-### **Install Terragrunt**
-
-1. Go to the [Terragrunt Releases page](https://github.com/gruntwork-io/terragrunt/releases).  
-2. Click the latest release version.  
-3. Scroll down to **Assets** and download terragrunt\_windows\_amd64.exe.  
-4. Move the file to C:\\DevOps.  
-5. **Critical Step:** Rename the file from terragrunt\_windows\_amd64.exe to terragrunt.exe.
+1. Apsilankykite [oficialioje „Git“ svetainėje](https://git-scm.com/download/win).  
+2. Atsisiųskite **64-bit Git for Windows Setup**.  
+3. Paleiskite diegimo failą.  
+4. **Pastaba:** Dažniausiai galite priimti visus numatytuosius nustatymus spausdami „Next“ (Toliau) per visą diegimo vedlį.
 
 ---
 
-## **3\. Configure System Environment Variables**
+## **2\. Failų katalogo paruošimas („Terraform“ ir „Terragrunt“)**
 
-For Windows to recognize terraform and terragrunt commands from any terminal window, you must add your binary folder to the System Path.
+Kadangi „Terraform“ ir „Terragrunt“ platinami kaip pavieniai failai, sukursime jiems skirtą vietą.
 
-1. Press the **Windows Key** and type env.  
-2. Select **Edit the system environment variables**.  
-3. Click the **Environment Variables...** button near the bottom.  
-4. In the **System variables** section (bottom pane), scroll down and select **Path**, then click **Edit**.  
-5. Click **New**.  
-6. Type the path to your folder: C:\\DevOps.  
-7. Click **OK** on all three open windows to save and close.
+1. Atidarykite „File Explorer“.  
+2. Dabalaukyje sukurkite aplanką pavadinimu "mokymai".  
+   * **Kelias:** C:\\Users\\<<"user name">>\\Desktop\\moykymai
 
----
+## **3. Mokymų repositorijos klonavimas**
 
-## **4\. Install Google Cloud SDK**
+1. Atsidarykite Terminal (Lango mygtukas -> Terminal)
+2. Suveskite komandą:
+```cd .\Desktop\mokymai\```
+3. Nusiklonuokite repositoriją:
+```git clone https://github.com/terasky-int/terragrunt-trainings.git``` 
 
-1. Download the [Google Cloud SDK Installer](https://www.google.com/search?q=https://cloud.google.com/sdk/docs/install%23windows).  
-2. Run the executable.  
-3. **Note:** Ensure the checkbox to install **bundled Python** is selected (unless you have a specific reason to manage Python manually).  
-4. Complete the installation wizard.
 
----
+## **4\. Sistemos aplinkos kintamųjų konfigūravimas (Environment Variables)**
 
-## **5\. Verification**
+Kad „Windows“ atpažintų terraform ir terragrunt komandas bet kuriame terminalo lange, turite pridėti sukurtą aplanką į sistemos „Path“ kintamąjį.
 
-**Important:** You must close any open terminal windows and open a **new** PowerShell or Command Prompt for the Path changes to take effect.
+1. Paspauskite **Windows klavišą** ir įveskite env.  
+2. Pasirinkite **Edit the system environment variables** (Redaguoti sistemos aplinkos kintamuosius).  
+3. Spustelėkite mygtuką **Environment Variables...** lango apačioje.  
+4. Skiltyje **System variables** (apatinis langas) raskite kintamąjį **Path**, pažymėkite jį ir spustelėkite **Edit** (Redaguoti).  
+5. Spustelėkite **New** (Naujas).  
+6. Įveskite aplanko kelią: C:\\Users\\<<"user name">>\\Desktop\\moykymai\\terragrunt-trainings\\1_Prepare_Env.  
+7. Spustelėkite **OK** visuose trijuose languose, kad išsaugotumėte pakeitimus ir uždarytumėte langus.
 
-Run the following commands to verify installation:
+## **5\. Gcloud CLI diegimas**
 
-PowerShell
+1. Atsidarome direktoriją
+```Desktop\mokymai\terragrunt-trainings\1_Prepare_Env```
+2. Du kartus paspaudžiame ant ```GoogleCloudSDKInstaller.exe```
+3. Atsidariusiame lange spaudžiame keletą kartų ```Next``` iki lango ```Select components to install```. Pažymime ```Cloud Tools for PowerShell```. Spaudžiame ```Install```.
+4. ```Next``` ir ```Finish```.
 
-\# Check Git  
-git \-\-version
+## **6\. Visual Studio Code diegimas**
 
-\# Check Terraform  
+1. Atsidarome naršyklėje
+```https://code/visualstudion.com/download```
+2. Pasirenkame ```Windows```.
+3. Atsidarome atsiūstą failą.
+4. Pora kartų spaudžiame ```Next```ir ```Install```.
+5. Baigusis diegimui, spaudžiame ```Finish```.
+
+
+## **ų\. Patikrinimas**
+
+**Svarbu:** Turite uždaryti visus atidarytus terminalo langus ir atidaryti **naują** „PowerShell“ arba „Command Prompt“ langą, kad „Path“ pakeitimai įsigaliotų.
+
+Norėdami patikrinti, ar įrankiai veikia, paleiskite šias komandas:
+
+```
+# Patikrinti Git  
+git \-\-version```
+
+# Patikrinti Terraform  
 terraform \-v
 
-\# Check Terragrunt  
+# Patikrinti Terragrunt  
 terragrunt \-v
 
-\# Check Google Cloud SDK  
+# Patikrinti Google Cloud SDK  
 gcloud \-v
+```
 
----
+## **6\. Inicializavimas**
 
-## **6\. Initialization**
-
-Once verified, initialize the Google Cloud CLI:
-
-Bash
-
+Kai patikrinimas sėkmingas, inicijuokite „Google Cloud CLI“:
+```
 gcloud init
+```
+Ši komanda atidarys naršyklę, kurioje turėsite prisijungti prie savo „Google“ paskyros ir pasirinkti GCP projektą.
 
-This will launch your browser to authenticate with your Google account and ask you to select your GCP Project.
 
