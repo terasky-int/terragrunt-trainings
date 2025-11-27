@@ -82,20 +82,20 @@ Tai yra Terraform „atmintis“. Be jos Terraform nežinotų, ką jau sukūrė.
 
 
 ## **Praktinė dalis**
-
-1. Apžiūrėti ```main.tf````
-2. Susipažinti ir išnagrinėti: providers, variables, resource ir output blokus
-3. Užpildyti terraform.tfvars failą:
+Žingsniai:
+1. Apžiūrėti ```main.tf```.
+2. Susipažinti ir išnagrinėti: ```providers```, ```variables```, ```resource``` ir ```output``` blokus.
+3. Užpildyti ```terraform.tfvars``` failą:
 - Project: aivaras-s-sandbox
 - Region: europe-west3
-- bucket_name: <vardas>_<pavarde>_<data>_<sugalvotas zodis>
-- bucket_location: europe-west3
+- bucket_name: ```<vardas>_<pavarde>_<data be tarpų>```
+- bucket_location: europe-west3.  
 **Svarbu:** bucket\_name turi būti **unikalus visame pasaulyje** (ne tik jūsų projekte). Jei toks vardas jau egzistuoja pas kitą Google vartotoją, gausite klaidą. Rekomenduojama naudoti mažąsias raides, skaičius, brūkšnius (-) arba pabraukimus (\_).
 4. Išsaugoti pakeitimus ```terraform.tfvars``` faile.
-5. terraform init
-6. Atkreipti dėmesį į atsiradusį naują direktoriją.
-7. terraform validate
-8. terraform plan
-9. terraform apply
+5. Paleiskite komandą ```terraform init```
+6. Atkreipti dėmesį į atsiradusią ```.terraform``` direktoriją.
+7. Paleiskite komandą ```terraform validate```
+8. Paleiskite komandą ```terraform plan```
+9. Paleiskite komandą ```terraform apply```, įrašykite į terminalą ```yes``` ir paspauskite ```Enter```.
 10. Atsidaryti ir apžiūrėti State failą.
-11. terragrunt destroy
+11. Paleiskite komandą ```terragrunt destroy```, įrašykite į terminalą ```yes``` ir paspauskite ```Enter```.

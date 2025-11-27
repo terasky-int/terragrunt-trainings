@@ -1,83 +1,62 @@
+Terraform moduliai yra esminis žingsnis pereinant nuo paprastų infrastruktūros skriptų prie profesionalaus, keičiamo dydžio (scalable) ir tvarkingo kodo valdymo. Tai tarsi perėjimas nuo „spageti kodo“ prie funkcinio programavimo.
 
-## ** Pagrindiniai Konceptai (Terraform Concepts)**
+### **1\. Įžanga: Kodėl mums reikia modulių?**
 
-*Čia aiškiname „statybines medžiagas“.*
+* **Problema:** Kopijuojamas kodas (Copy-Paste). Jei turime 10 serverių ir norime pakeisti vieną parametrą, turime keisti 10 vietų.  
+* **Sprendimas:** **DRY** (Don't Repeat Yourself) principas.  
+* **Analogija:** Moduliai yra kaip „funkcijos“ programavime arba „LEGO kaladėlės“. Tu sukuri vieną kaladėlę (pvz., standartizuotą saugyklą) ir naudoji ją daug kartų.
 
-### **1\. Providers (Tiekėjai)**
 
-Terraform pats savaime nežino, kaip sukurti serverį AWS ar „DigitalOcean“. Jam reikia „vertėjo“.  
-* **Esmė:** Provider'iai yra įskiepiai (plugins), kurie leidžia Terraform bendrauti su konkrečių debesų API (AWS, Azure, Google Cloud, Kubernetes ir kt.).  
-* **Pavyzdys:** ```provider "aws" { region \= "us-east-1" }```
+### **2\. Modulio Anatomija (Struktūra)**
 
-### **2\. Resources (Resursai / Ištekliai)**
+Paaiškink, iš ko susideda standartinis modulis. Tai nėra magija – tai tiesiog aplankas su .tf failais.
 
-Tai yra svarbiausia dalis. Tai konkretūs objektai, kuriuos sukuriame.  
-* **Esmė:** Kiekvienas resursas priklauso tam tikram provider'iui.  
-* **Pavyzdys:** Virtuali mašina (aws\_instance), duomenų bazė, IP adresas, ugniasienės taisyklė.  
-* **Sintaksė:** ```resource "tipas" "vardas" { ...nustatymai... }```
+Standartinė failų struktūra:
 
-### **3\. Variables (Kintamieji)**
-
-Kad nereikėtų kodo rašyti "hardcode" stiliumi , naudojame kintamuosius. Tai leidžia tą patį kodą naudoti skirtingoms aplinkoms (DEV, STAGE, PROD).  
-* **Tipai:**  
-  * **Input Variables:** Parametrai, kuriuos paduodame (pvz., serverio dydis, regionas).  
-  * **Output Values:** Informacija, kurią gauname po sukūrimo (pvz., serverio IP adresas).  
-  * **Local Values:** Laikini kintamieji skaičiavimams kodo viduje.
-
-### **4\. State (Būsena) \* 
-Tai yra Terraform „atmintis“. Be jos Terraform nežinotų, ką jau sukūrė.**
-
-* **Failas:** Dažniausiai tai terraform.tfstate failas (JSON formatu).  
-* **Kaip veikia:** State faile Terraform sujungia jūsų parašytą kodą su realiais objektais debesyje (pvz., kodas resource "aws\_s3\_bucket" "b" atitinka realų bucket'ą su ID my-bucket-123).  
-* **Svarbu:** State failas turi būti saugomas saugiai (dažniausiai nuotoliniu būdu, pvz., S3), nes ten gali būti slaptažodžių, ir tam, kad komanda galėtų dirbti kartu.
+* ```main.tf```: Pagrindinė logika (resursai).  
+* ```variables.tf```: **Input** (įvesties parametrai) – tarsi funkcijos argumentai.  
+* ```outputs.tf```: **Output** (išvesties reikšmės) – ką modulis grąžina (pvz., sukurto serverio IP).  
+* ```README.md```: Dokumentacija (būtina gerai praktikai).
 
 ---
 
-## ** Komandos ir Darbo Eiga (Workflow)**
+### **4\. Modulių šaltiniai (Module Sources)**
 
+Paaiškink, kad moduliai nebūtinai turi būti vietiniame diske.
 
-### **1\. terraform init (Inicijavimas)**
+1. **Local Paths:** ```./modules/my-module``` (geriausia mokymuisi ir testavimui).  
+2. **Terraform Registry:** Vieši, bendruomenės sukurti moduliai (pvz., oficialus AWS VPC modulis). Tai sutaupo daug laiko.  
+3. **Git (GitHub/GitLab):** Privatiems įmonės moduliams.  
+   * *Pavyzdys:* ```source \= "git::https://github.com/my-org/terraform-modules.git//aws-vpc?ref=v1.0.0"```
 
-* **Kada naudoti:** Patį pirmą kartą atsisiuntus kodą arba pridėjus naują provider'į/modulį.  
-* **Ką daro:**  
-  * Nuskaito kodą ir supranta, kokių provider'ių reikia.  
-  * Atsisiunčia tų provider'ių dvejetainius failus (plugins) į .terraform aplanką.  
-  * Paruošia backend'ą (kur bus saugomas State failas).  
-* **Analogiija:** Tai lyg įrankių dėžės atsinešimas prieš statybas.
+**Svarbu:** Versijavimas (?ref=v1.0.0). Niekada nenaudokite latest versijos gamybinėje aplinkoje (Production), nes pasikeitus moduliui, gali „sugriūti“ infrastruktūra.
 
-### **2\. terraform plan (Planavimas / Peržiūra)**
+---
 
-* **Kada naudoti:** Visada prieš darant pakeitimus.  
-* **Ką daro:**  
-  * Palygina jūsų kodą su State failu ir realia situacija debesyje.  
-  * Parodo, kas bus padaryta:  
-    * \+ (žalia) – bus sukurta.  
-    * \- (raudona) – bus ištrinta.  
-    * \~ (geltona) – bus pakeista (updated).  
-* **Svarbu:** Tai „saugus“ veiksmas, niekas dar nekeičiama. Tai lyg brėžinio peržiūra.
+### **5\. Gerosios praktikos (Best Practices)**
 
-### **3\. terraform apply (Vykdymas)**
+* **Versijavimas:** Visada naudokite versijas (Git tags).  
+* **Dokumentacija:** Naudokite įrankius kaip terraform-docs, kad automatiškai sugeneruotumėte aprašymus.  
+* **Kapsuliavimas (Encapsulation):** Modulis turi daryti vieną dalyką gerai. Nekurkite „Dievo modulio“, kuris sukuria visą tinklą, serverius ir duomenų bazes viename.  
+* **Defaults:** Naudokite protingas numatytąsias reikšmes variables.tf, kad modulį būtų lengva naudoti nekonfigūruojant kiekvienos smulkmenos.
 
-* **Kada naudoti:** Kai esate patenkinti tuo, ką parodė plan.  
-* **Ką daro:**  
-  * Atlieka realius veiksmus (kreipiasi į API).  
-  * Sukuria, pakeičia arba ištrina resursus.  
-  * Atnaujina terraform.tfstate failą su naujausia informacija.  
-* **Pastaba:** Dažnai prašo patvirtinimo (yes).
+---
 
-### **4\. terraform destroy (Sunaikinimas)**
+### **6\. Praktinė užduotis**
 
-* **Kada naudoti:** Kai norite viską ištrinti (pvz., baigėsi testavimas, naikinama aplinka).  
-* **Ką daro:** Ištrina visus resursus, kurie aprašyti kode ir egzistuoja state faile.  
-* **Įspėjimas:** Naudoti labai atsargiai\!
+Iš prieš tai sukurto terraform skripto (direktorija ```2_Terraform_Basics```) reikės sukurti modulį ir jį panaudoti kitame modulyje.
 
-### **5\. terraform state (Būsenos valdymas)**
+1. Iš direktorijos ```2_Terraform_Basics``` ```main.tf``` failo:
+    - Nukopijuokite visus ```provider``` blokus į ```3_Terraform_Modules\bucket_module\provider.tf``` failą.
+    - Nukopijuokite visus ```variable``` blokus į ```3_Terraform_Modules\bucket_module\varialbes.tf``` failą.
+    - Nukopijuokite visus ```provider``` blokus į ```3_Terraform_Modules\bucket_module\provider.tf``` failą.
+    - Nukopijuokite visus ```output``` blokus į ```3_Terraform_Modules\bucket_module\outputs.tf``` failą.      
+2. Peržiūrėkite ```3_Terraform_Modules\provider.tf``` failą. Atkreipkite į ```teraform``` bloką.
+3. Peržiūrėkite ```3_Terraform_Modules\variables.tf``` failą.
+4. Atsidarykite ```3_Terraform_Modules\main.tf``` failą ir padarykite pakeitimus bloke ```
+module "bucket" {
 
-* *Tai skiriasi nuo „State koncepto“. Čia kalbama apie komandas darbui su būsena.*  
-* **Kada naudoti:** Pažengusiems veiksmams (troubleshooting, refactoring).  
-* **Populiarios sub-komandos:**  
-  * terraform state list – parodo visus sekamus resursus.  
-  * terraform state show \<adresas\> – parodo detalią info apie vieną resursą.  
-  * terraform state rm – nustoja sekti resursą (ištrina iš state failo, bet palieka debesyje).  
-  * terraform state mv – pervadina resursą state faile (naudojama refaktorinant kodą).
-
+}
+```
+    - asd
+1. 

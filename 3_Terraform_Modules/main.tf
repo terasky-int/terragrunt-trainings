@@ -1,38 +1,29 @@
-provider "google" {
-  project = var.project
-  region  = var.region
-  batching {
-    enable_batching = "false"
+module "bucket" {
+  source = ""
+
+}
+
+data "google_project" "project" {
+  project_id = var.project
+}
+
+module "service-account-orgin" {
+  source                 = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/iam-service-account?ref=v39.2.0"
+  project_id             = var.project
+  name                   = var.sa_name
+  project_number         = data.google_project.project.number
+  service_account_create = true
+  iam_project_roles = {
+    (var.project) = [
+      "roles/storage.admin"
+    ]
   }
+  create_ignore_already_exists = true
+  display_name                 = var.sa_name
 }
 
-variable "project" {
-  description = "The project ID to host the cluster in"
-  type        = string
+resource "google_storage_hmac_key" "hmac_key" {
+  project               = var.project
+  service_account_email = module.service-account-orgin.email
 }
 
-variable "region" {
-  description = "The region"
-  type        = string
-}
-
-variable "bucket_name" {
-  description = "Name for GCS bucket"
-  type        = string
-}
-
-variable "bucket_location" {
-  description = "GCS bucket location"
-  type        = string
-}
-
-resource "google_storage_bucket" "bucket" {
-  name                        = var.bucket_name
-  location                    = var.bucket_location
-  project                     = var.project
-  uniform_bucket_level_access = true
-}
-
-output "bucket_name" {
-  value = trimprefix(google_storage_bucket.bucket.url, "gs://")
-}
