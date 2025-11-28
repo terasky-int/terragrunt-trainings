@@ -30,7 +30,7 @@ terraform {
 # Inputs for the bootstrap module
 inputs = {
   # Required variables
-  org_id          = "111111111111"          # Replace with your actual GCP Organization ID
+  org_id          = "111111111111"         # Replace with your actual GCP Organization ID
   billing_account = "111111-111111-111111" # Replace with your actual billing account ID
 
   # Groups configuration

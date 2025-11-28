@@ -48,15 +48,37 @@ Iš prieš tai sukurto terraform skripto (direktorija ```2_Terraform_Basics```) 
 
 1. Iš direktorijos ```2_Terraform_Basics``` ```main.tf``` failo:
     - Nukopijuokite visus ```provider``` blokus į ```3_Terraform_Modules\bucket_module\provider.tf``` failą.
-    - Nukopijuokite visus ```variable``` blokus į ```3_Terraform_Modules\bucket_module\varialbes.tf``` failą.
+    - Nukopijuokite visus `variable` blokus į ```3_Terraform_Modules\bucket_module\varialbes.tf``` failą.
     - Nukopijuokite visus ```provider``` blokus į ```3_Terraform_Modules\bucket_module\provider.tf``` failą.
     - Nukopijuokite visus ```output``` blokus į ```3_Terraform_Modules\bucket_module\outputs.tf``` failą.      
 2. Peržiūrėkite ```3_Terraform_Modules\provider.tf``` failą. Atkreipkite į ```teraform``` bloką.
 3. Peržiūrėkite ```3_Terraform_Modules\variables.tf``` failą.
-4. Atsidarykite ```3_Terraform_Modules\main.tf``` failą ir padarykite pakeitimus bloke ```
-module "bucket" {
+4. Atsidarykite ```3_Terraform_Modules\main.tf``` failą ir atlikite pakeitimus bloke ```module bucket {}```
+    - ```source``` nurodykite kelią iki ką tik sukurto modulio - ```".\bucket_module"```
+    - Po ```source``` pridėkite kitamąjį ```project``` su reikšme ```var.project```
+    - Po ```source``` pridėkite kitamąjį ```region``` su reikšme ```var.region```
+    - Po ```source``` pridėkite kitamąjį ```bucket_name``` su reikšme ```var.bucket_name```
+    - Po ```source``` pridėkite kitamąjį ```bucket_location``` su reikšme ```var.bucket_location```.     
 
+Toks rezultatas turėtų būti:
+```
+module "bucket" {
+  source = ".\bucket_module"
+  project = var.project
+  region = var.region
+  bucket_name = var.bucket_name
+  bucket_location = var.bucket_location
 }
 ```
-    - asd
-1. 
+
+5. Peržvelkite likusį ```3_Terraform_Modules\main.tf``` failą. Atkreipkite dėmesį į kitą modulį, kuriuo ```source``` patalpintas git ir turi nurodytą versiją.
+6. Užpildykite ```3_Terraform_Modules\terraform.tfvars``` failą:
+- Project: ```aivaras-s-sandbox```
+- Region: ```europe-west3```
+- bucket_name: ```<vardas>_<pavarde>_<data be tarpų>```
+- sa_name: ```<vardas>_<pavarde>```
+7. Paleiskite komandą ```terraform init```
+8. Paleiskite komandą ```terraform validate```
+9. Paleiskite komandą ```terraform plan```
+10. Paleiskite komandą ```terraform apply```, įrašykite į terminalą ```yes``` ir paspauskite ```Enter```.
+11. **Klausimas:** Kodėl prieš tai mums ```terraform.tfvars``` faile reikėjo nurodyti ```bucket_location``` o dabar ne ?

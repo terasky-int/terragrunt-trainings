@@ -14,19 +14,19 @@ dependencies {
 
 locals {
 
-#  gcp_groups_roles = {
-#
-#    "gcp-data-engineering-editor" = [
-#      "roles/editor"                    
-#    ]
-#  }
+  #  gcp_groups_roles = {
+  #
+  #    "gcp-data-engineering-editor" = [
+  #      "roles/editor"                    
+  #    ]
+  #  }
 }
 
 inputs = {
-  name                  = basename(dirname(get_terragrunt_dir()))
-  parent                = "organizations/${include.shared.locals.organization_id}"
-    # Convert groups/roles mapping to Fabric organization module IAM format
-  iam = {}
+  name   = basename(dirname(get_terragrunt_dir()))
+  parent = "organizations/${include.shared.locals.organization_id}"
+  # Convert groups/roles mapping to Fabric organization module IAM format
+  iam                   = {}
   iam_bindings_additive = {}
   org_policies          = {}
   tag_bindings          = {}

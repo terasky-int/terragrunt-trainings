@@ -22,7 +22,7 @@ dependency "Env" {
 
 dependencies {
   paths = [
-    "../_org" 
+    "../_org"
   ]
 }
 
@@ -43,7 +43,7 @@ inputs = {
       display_name = "Current month's spend of the organization"
       amount = {
         currency_code = "EUR"
-        units = "1000"        
+        units         = "1000"
       }
       filter = {
         period = {

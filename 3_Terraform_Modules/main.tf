@@ -1,6 +1,5 @@
 module "bucket" {
   source = ""
-
 }
 
 data "google_project" "project" {
