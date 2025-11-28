@@ -4,7 +4,7 @@ locals {
   # Base groups and their roles mapping
   gcp_groups_roles = {
 
-    "gcp-customer-org-all-vssa_admins" = [
+    "gcp-sre-org-admins" = [
       "roles/billing.user",                      # Billing Account User
       "roles/compute.xpnAdmin",                  # Compute Shared VPC Admin
       "roles/resourcemanager.folderAdmin",       # Folder Admin
@@ -18,19 +18,19 @@ locals {
       "roles/cloudsupport.admin"                 # Support Account Administrator
     ]
 
-    "gcp-customer-org-all-customer_admins" = [
-      #"roles/billing.user",                      # Billing Account User will be granted on the Billing Account itself which belongs to the reseller
-      #"roles/billing.viewer",                    # Billing Account Viewer will be granted on the Billing Account itself which belongs to the reseller
-      "roles/compute.xpnAdmin",                  # Compute Shared VPC Admin
-      "roles/resourcemanager.folderAdmin",       # Folder Admin
-      "roles/resourcemanager.projectCreator",    # Project Creator
-      "roles/securitycenter.admin",              # Security Center Admin
-      "roles/cloudsupport.admin"                 # Support Account Administrator
-    ]
+#    "gcp-customer-org-all-customer_admins" = [
+#      #"roles/billing.user",                      # Billing Account User will be granted on the Billing Account itself which belongs to the reseller
+#      #"roles/billing.viewer",                    # Billing Account Viewer will be granted on the Billing Account itself which belongs to the reseller
+#      "roles/compute.xpnAdmin",                  # Compute Shared VPC Admin
+#      "roles/resourcemanager.folderAdmin",       # Folder Admin
+#      "roles/resourcemanager.projectCreator",    # Project Creator
+#      "roles/securitycenter.admin",              # Security Center Admin
+#      "roles/cloudsupport.admin"                 # Support Account Administrator
+#    ]
 
-    "gcp-customer-org-all-customer_viewers" = [
-      "roles/viewer"
-    ]
+#    "gcp-customer-org-all-customer_viewers" = [
+#      "roles/viewer"
+#    ]
 
   }
   # Organization policies configuration
@@ -210,96 +210,7 @@ locals {
     }
   }
   organization_id = "organizations/${include.shared.locals.organization_id}"
-  dynamic_custom_roles = {
-    IamManageDenyRole = {   # The role id to create for this role.
-      parents_roles = ["roles/resourcemanager.organizationAdmin","roles/owner"]
-      exclude_permissions = [
-        "resourcemanager.organizations.createPolicyBinding",
-        "resourcemanager.organizations.deletePolicyBinding",
-        "resourcemanager.organizations.searchPolicyBindings",
-        "resourcemanager.organizations.setIamPolicy",
-        "resourcemanager.organizations.updatePolicyBinding",
-        #NOT_SUPPORTED permissions for Custom role
-        "appengine.runtimes.actAsAdmin",
-        "bigquery.rowAccessPolicies.overrideTimeTravelRestrictions",
-        "cloudaicompanion.topics.delete",
-        "cloudaicompanion.topics.update",
-        "cloudmigration.velostrataendpoints.connect",
-        "cloudonefs.isiloncloud.com/clusters.create",
-        "cloudonefs.isiloncloud.com/clusters.delete",
-        "cloudonefs.isiloncloud.com/clusters.get",
-        "cloudonefs.isiloncloud.com/clusters.list",
-        "cloudonefs.isiloncloud.com/clusters.update",
-        "cloudonefs.isiloncloud.com/clusters.updateAdvancedSettings",
-        "cloudonefs.isiloncloud.com/fileshares.create",
-        "cloudonefs.isiloncloud.com/fileshares.delete",
-        "cloudonefs.isiloncloud.com/fileshares.get",
-        "cloudonefs.isiloncloud.com/fileshares.list",
-        "cloudonefs.isiloncloud.com/fileshares.update",
-        "dataplex.assets.ownData",
-        "dataplex.assets.readData",
-        "dataplex.assets.writeData",
-        "domains.registrations.configureContact",
-        "domains.registrations.configureDns",
-        "domains.registrations.configureManagement",
-        "domains.registrations.create",
-        "domains.registrations.delete",
-        "domains.registrations.get",
-        "domains.registrations.getIamPolicy",
-        "domains.registrations.list",
-        "domains.registrations.setIamPolicy",
-        "domains.registrations.update",
-        "gcp.redisenterprise.com/databases.create",
-        "gcp.redisenterprise.com/databases.delete",
-        "gcp.redisenterprise.com/databases.get",
-        "gcp.redisenterprise.com/databases.list",
-        "gcp.redisenterprise.com/databases.update",
-        "gcp.redisenterprise.com/subscriptions.create",
-        "gcp.redisenterprise.com/subscriptions.delete",
-        "gcp.redisenterprise.com/subscriptions.get",
-        "gcp.redisenterprise.com/subscriptions.list",
-        "gcp.redisenterprise.com/subscriptions.update",
-        "gke.fleets.create",
-        "gke.fleets.delete",
-        "gke.fleets.get",
-        "gke.fleets.update",
-        "gkehub.fleet.create",
-        "gkehub.fleet.delete",
-        "gkehub.fleet.get",
-        "gkehub.fleet.update",
-        "iam.denypolicies.create",
-        "iam.denypolicies.delete",
-        "iam.denypolicies.replace",
-        "iam.denypolicies.update",
-        "iam.googleapis.com/denypolicies.create",
-        "iam.googleapis.com/denypolicies.delete",
-        "iam.googleapis.com/denypolicies.replace",
-        "iam.principalaccessboundarypolicies.bind",
-        "iam.principalaccessboundarypolicies.create",
-        "iam.principalaccessboundarypolicies.delete",
-        "iam.principalaccessboundarypolicies.unbind",
-        "iam.principalaccessboundarypolicies.update",
-        "orgpolicy.customConstraints.create",
-        "orgpolicy.customConstraints.delete",
-        "orgpolicy.customConstraints.update",
-        "orgpolicy.policies.create",
-        "orgpolicy.policies.delete",
-        "orgpolicy.policies.update",
-        "orgpolicy.policy.set",
-        "privilegedaccessmanager.settings.update",
-        "resourcesettings.settings.update",
-        "source.repos.update",
-        "stackdriver.projects.edit",
-        "storagetransfer.agentpools.report",
-        "storagetransfer.operations.assign",
-        "storagetransfer.operations.report",
-        "telcoautomation.edgeSlms.create"
-      ]
-      role_title = "IamManageDenyRole"
-      role_description    = "This role is a combination of Owner and Organization Administrator roles, but without IAM and Org Policy management permissions"
-      attached_to = ["group:gcp-customer-org-all-customer_admins@cpva.gcp.vssa.lt"]
-    }
-  }
+
 }
 
 generate "provider" {
@@ -317,12 +228,12 @@ EOF
 
 terraform {
   #  source = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/organization?ref=v40.2.0"
-  source = "github.com/terasky-int/tsb-tf-modules.git//checked-modules/organization"
+  source = "github.com/terasky-int/training-modules.git//modules/organization"
 }
 
 # Include common configuration
 include "shared" {
-  path   = find_in_parent_folders()
+  path   = find_in_parent_folders("root.hcl")
   expose = true
 }
 
@@ -338,7 +249,7 @@ inputs = {
   # Organization policies
   org_policies = local.org_policies
 
-  dynamic_custom_roles = local.dynamic_custom_roles
+  #dynamic_custom_roles = local.dynamic_custom_roles
   # Custom roles
   custom_roles = local.custom_roles
 

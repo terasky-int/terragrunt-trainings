@@ -1,5 +1,9 @@
 module "bucket" {
-  source = ""
+  source = "./bucket_module"
+  project = var.project
+  region = var.region
+  bucket_name = var.bucket_name
+  bucket_location = var.bucket_location
 }
 
 data "google_project" "project" {
