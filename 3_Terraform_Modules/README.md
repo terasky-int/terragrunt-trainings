@@ -76,7 +76,7 @@ module "bucket" {
 - Project: ```aivaras-s-sandbox```
 - Region: ```europe-west3```
 - bucket_name: ```<vardas>_<pavarde>_<data be tarpų>```
-- sa_name: ```<vardas>_<pavarde>```
+- sa_name: ```<vardas>-<pavarde>```
 7. Paleiskite komandą ```terraform init```
 8. Paleiskite komandą ```terraform validate```
 9. Paleiskite komandą ```terraform plan```

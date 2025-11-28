@@ -174,6 +174,13 @@ Organizacijos aplanko kūrimo vietoje (`organization`) atidarykite ```root.hcl``
   * ```region``` -  Nustato numatytąjį „Google Cloud“ regioną, kuriame bus diegiami resursai, jei nenurodyta kitaip. Tai padeda užtikrinti, kad resursai būtų kuriami nuoseklioje geografinėje vietoje.
   * ```project_prefix``` - Trumpas eilutės priešdėlis, naudojamas generuojant naujų projektų ID.
   * ```default_budget_notification_project``` -  Projekto ID, kuriame yra „Pub/Sub“ tema (topic), naudojama gaunant pranešimus apie biudžetą. Biudžetai nustatomi atsiskaitymo paskyroje, o šis projektas suteikia mechanizmą („Pub/Sub“ temą) programiniams įspėjimams gauti, kai išlaidos viršija nustatytas ribas. Gali būti tas pats kaip „seed“ projektas.
+  * ```prefix``` - priešdėlis naudojamas resursams kurti.
+  * ```region_trigram``` - sutrumpinimas regionui.
+  * ```client_name``` - : euw4 (sutrumpinimas regionui europe-west4).
+  * ```client_name``` - : euw4 (sutrumpinimas regionui europe-west4).
+client_name: cst (kliento kodas arba padalinio trumpinys).
+
+env: prod (aplinka – Production). 
 
 * Organizacijos aplanko kūrimo vietoje (`4_Organization/organization/_org`) atidarykite ```terragrunt.hcl``` ir atlikite pakeitimus: 
   * ```locals``` blokas:
@@ -182,6 +189,7 @@ Organizacijos aplanko kūrimo vietoje (`organization`) atidarykite ```root.hcl``
     * ```custom_roles``` - jei reikia, GCP pasirinktiniai vaidmenys (custom roles) su jiems priskirtų teisių sąrašu.
   * ```inputs``` blokas:
     * ```tags``` - žymų (tags) konfigūracija. Žymos pagal rakto pavadinimą. Jei pateikiamas ID, rakto arba reikšmės kūrimas praleidžiamas.
+
 
 ### **Aktyvios grupės ir vaidmenys**
 
@@ -400,7 +408,6 @@ Galiausiai sukūrę visą struktūrą, pereikite per pagrindinius organizacijos 
 
 #### **Pilnas failų struktūros pavyzdys**
 ```
-```
 .  
 ├── Env/  
 │   ├── _folder/  
@@ -499,11 +506,16 @@ Atlikę pakeitimus, nueikite į ```_billing``` aplanką ir vykdykite:
    ```terragrunt apply```
 
 ## **Žurnalų vedimas (Logging) Papidlomas darbas**
+
+**Jei norite atlikti šį žingsnį turite susikurti naują projektą tam arba pernaudoti jau sukurtą**
+
 Ši konfigūracija naudoja „cloud-foundation-fabric“ modulį, kad sukurtų **centralizuotą organizacijos lygio žurnalų rinktuvą (logging sink)**. Pagrindinis tikslas yra surinkti visus žurnalo įrašus iš kiekvieno projekto ir aplanko jūsų „Google Cloud“ organizacijoje ir nukreipti juos į vieną dedikuotą „Cloud Logging“ saugyklą centriniame žurnalų projekte.
 
 Šis metodas yra geriausia praktika saugumui, auditui ir atitikčiai užtikrinti, nes tai garantuoja, kad visi žurnalai yra agreguojami vienoje saugioje, valdomoje vietoje.
 
-### **Logging konfigūracija ()**
+
+
+### **Logging konfigūracija**
 Logging pranešimų konfigūracija patalpinta ```organization``` katalogo ```_logging_``` aplanko ```terragrunt.hcl``` faile.
 
 Atlikite pakeitimus pagal poreikį.

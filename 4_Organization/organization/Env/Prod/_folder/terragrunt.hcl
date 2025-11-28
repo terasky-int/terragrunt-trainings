@@ -3,12 +3,15 @@ terraform {
 }
 
 include "shared" {
-  path   = find_in_parent_folders()
+  path   = find_in_parent_folders("root.hcl")
   expose = true
 }
 
 dependency "parent" {
   config_path = "../../_folder"
+  mock_outputs = {
+    id = "folders/12345678910"
+  }
 }
 
 inputs = {
