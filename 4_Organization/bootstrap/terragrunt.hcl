@@ -1,27 +1,27 @@
 # Terragrunt configuration for the bootstrap module
 
-#remote_state {
-# backend = "local"
-#  config = {
-#    path = "${path_relative_to_include()}/terraform.tfstate"
-#  }
-#}
-
 remote_state {
-  disable_dependency_optimization = true
-  backend                         = "gcs"
-  generate = {
-    path      = "backend.tf"
-    if_exists = "overwrite"
-  }
-
-  config = {
-    project  = "shared-terraform-seed-fba8"
-    location = "europe-west4"
-    bucket   = "shared-terraform-seed-tfstate-ca69"
-    prefix   = "bootstrap/terraform.tfstate"
-  }
+backend = "local"
+ config = {
+   path = "${path_relative_to_include()}/terraform.tfstate"
+ }
 }
+
+# remote_state {
+#   disable_dependency_optimization = true
+#   backend                         = "gcs"
+#   generate = {
+#     path      = "backend.tf"
+#     if_exists = "overwrite"
+#   }
+
+#   config = {
+#     project  = "<seed project id>"
+#     location = "europe-west4"
+#     bucket   = "<seed project bucket name>"
+#     prefix   = "bootstrap/terraform.tfstate"
+#   }
+# }
 
 terraform {
   source = "github.com/terasky-int/tsb-tf-modules.git//modules/bootstrap"

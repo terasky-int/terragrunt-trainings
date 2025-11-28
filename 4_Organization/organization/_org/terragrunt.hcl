@@ -4,10 +4,11 @@ locals {
   # Base groups and their roles mapping
   gcp_groups_roles = {
 
-    "gcp-customer-org-all-organization_admins" = [
+    "gcp-customer-org-all-vssa_admins" = [
       "roles/billing.user",                      # Billing Account User
       "roles/compute.xpnAdmin",                  # Compute Shared VPC Admin
       "roles/resourcemanager.folderAdmin",       # Folder Admin
+      "roles/iam.denyAdmin",
       "roles/resourcemanager.organizationAdmin", # Organization Administrator
       "roles/orgpolicy.policyAdmin",             # Organization Policy Administrator
       "roles/iam.organizationRoleAdmin",         # Organization Role Administrator
@@ -18,16 +19,13 @@ locals {
     ]
 
     "gcp-customer-org-all-customer_admins" = [
-      "roles/billing.user", # Billing Account User
+      #"roles/billing.user",                      # Billing Account User will be granted on the Billing Account itself which belongs to the reseller
       #"roles/billing.viewer",                    # Billing Account Viewer will be granted on the Billing Account itself which belongs to the reseller
       "roles/compute.xpnAdmin",                  # Compute Shared VPC Admin
       "roles/resourcemanager.folderAdmin",       # Folder Admin
-      "roles/resourcemanager.organizationAdmin", # Organization Administrator
-      "roles/owner",                             # Owner
       "roles/resourcemanager.projectCreator",    # Project Creator
       "roles/securitycenter.admin",              # Security Center Admin
-      "roles/cloudsupport.admin",                # Support Account Administrator
-      #dependency.dynamic_custom_roles.outputs.id
+      "roles/cloudsupport.admin"                 # Support Account Administrator
     ]
 
     "gcp-customer-org-all-customer_viewers" = [
@@ -49,7 +47,7 @@ locals {
     "gcp.detailedAuditLoggingMode"   = { rules = [{ enforce = true }] } # Enables detailed audit logging
     # "iam.managed.preventPrivilegedBasicRolesForDefaultServiceAccounts" = { rules = [{ enforce = true }] } # Prevents Owner/Editor/Viewer on default SAs
     "container.managed.enableNetworkPolicy"     = { rules = [{ enforce = true }] } # Enforces Network Policy in GKE clusters #Requested entity already exists
-    "container.managed.enablePrivateNodes"      = { rules = [{ enforce = true }] } # Enforces Private Nodes in GKE clusters
+    #"container.managed.enablePrivateNodes"      = { rules = [{ enforce = true }] } # Enforces Private Nodes in GKE clusters
     "container.managed.enableSecretsEncryption" = { rules = [{ enforce = true }] } # Enforces app-layer secret encryption in GKE
     # "container.managed.enableWorkloadIdentityFederation"       = { rules = [{ enforce = true }] } # Enforces Workload Identity in GKE #Requested entity already exists 
     "run.managed.requireInvokerIam"                          = { rules = [{ enforce = true }] }  # Requires IAM for Cloud Run invoker role
@@ -122,33 +120,30 @@ locals {
     #   }]
     # }
 
-    # Restricts which services can be enabled.
-    #    "gcp.restrictServiceUsage" = {
-    #      rules = [{
-    #        allow = { values = [
-    #          "essentialcontacts.googleapis.com",
-    #          "logging.googleapis.com",
-    #          "monitoring.googleapis.com",
-    #          "storage.googleapis.com",
-    #          "compute.googleapis.com",
-    #          "secretmanager.googleapis.com",
-    #          "securitycenter.googleapis.com", #SCC Security Command Center
-    #          "cloudasset.googleapis.com", #SCC
-    #          "cloudresourcemanager.googleapis.com", #SCC
-    #          "aiplatform.googleapis.com", #Vertex AI
-    #          "cloudsupport.googleapis.com", #Support
-    #          "firebase.googleapis.com", #Firebase management api
-    #          "documentai.googleapis.com", #Document AI api
-    #          "cloudaicompanion.googleapis.com", #Gemini api
-    #          "bigquery.googleapis.com", #BQ api
-    #          "dns.googleapis.com", #DNS
-    #          "logging.googleapis.com", # CLoud Logging API
-    #          "vision.googleapis.com" #Vision API
-    #
-    #          # Add all other essential services you need
-    #        ] }
-    #      }]
-    #    }
+    #Restricts which services can be enabled.
+       "gcp.restrictServiceUsage" = {
+         rules = [{
+           allow = { values = [
+             "dns.googleapis.com",
+             "securitycenter.googleapis.com",
+             "osconfig.googleapis.com",
+             "run.googleapis.com",
+             "container.googleapis.com",
+             "sqladmin.googleapis.com",
+             "servicedirectory.googleapis.com",
+             "discoveryengine.googleapis.com",
+             "storage.googleapis.com",
+             "servicehealth.googleapis.com",
+             "compute.googleapis.com",
+             "connectors.googleapis.com",
+             "secretmanager.googleapis.com",
+             "accesscontextmanager.googleapis.com",
+             "billingbudgets.googleapis.com",
+             "vmmigration.googleapis.com"
+
+           ] }
+         }]
+       }
 
     # # Restricts which physical locations can be used for resources.
     "gcp.resourceLocations" = {
@@ -216,51 +211,95 @@ locals {
   }
   organization_id = "organizations/${include.shared.locals.organization_id}"
   dynamic_custom_roles = {
-    iam-manage-deny-role = { # The role id to create for this role.
-      parent_roles       = ["roles/resourcemanager.organizationAdmin", "roles/owner"]
-      exlude_permissions = ["resourcemanager.organizations.createPolicyBinding", "resourcemanager.organizations.deletePolicyBinding", "resourcemanager.organizations.searchPolicyBindings", "resourcemanager.organizations.setIamPolicy", "resourcemanager.organizations.updatePolicyBinding"]
-      role_title         = "iam-manage-deny-role"
-      role_description   = "This role is a combination of Owner and Organization Administrator roles, but without IAM and Org Policy management permissions"
+    IamManageDenyRole = {   # The role id to create for this role.
+      parents_roles = ["roles/resourcemanager.organizationAdmin","roles/owner"]
+      exclude_permissions = [
+        "resourcemanager.organizations.createPolicyBinding",
+        "resourcemanager.organizations.deletePolicyBinding",
+        "resourcemanager.organizations.searchPolicyBindings",
+        "resourcemanager.organizations.setIamPolicy",
+        "resourcemanager.organizations.updatePolicyBinding",
+        #NOT_SUPPORTED permissions for Custom role
+        "appengine.runtimes.actAsAdmin",
+        "bigquery.rowAccessPolicies.overrideTimeTravelRestrictions",
+        "cloudaicompanion.topics.delete",
+        "cloudaicompanion.topics.update",
+        "cloudmigration.velostrataendpoints.connect",
+        "cloudonefs.isiloncloud.com/clusters.create",
+        "cloudonefs.isiloncloud.com/clusters.delete",
+        "cloudonefs.isiloncloud.com/clusters.get",
+        "cloudonefs.isiloncloud.com/clusters.list",
+        "cloudonefs.isiloncloud.com/clusters.update",
+        "cloudonefs.isiloncloud.com/clusters.updateAdvancedSettings",
+        "cloudonefs.isiloncloud.com/fileshares.create",
+        "cloudonefs.isiloncloud.com/fileshares.delete",
+        "cloudonefs.isiloncloud.com/fileshares.get",
+        "cloudonefs.isiloncloud.com/fileshares.list",
+        "cloudonefs.isiloncloud.com/fileshares.update",
+        "dataplex.assets.ownData",
+        "dataplex.assets.readData",
+        "dataplex.assets.writeData",
+        "domains.registrations.configureContact",
+        "domains.registrations.configureDns",
+        "domains.registrations.configureManagement",
+        "domains.registrations.create",
+        "domains.registrations.delete",
+        "domains.registrations.get",
+        "domains.registrations.getIamPolicy",
+        "domains.registrations.list",
+        "domains.registrations.setIamPolicy",
+        "domains.registrations.update",
+        "gcp.redisenterprise.com/databases.create",
+        "gcp.redisenterprise.com/databases.delete",
+        "gcp.redisenterprise.com/databases.get",
+        "gcp.redisenterprise.com/databases.list",
+        "gcp.redisenterprise.com/databases.update",
+        "gcp.redisenterprise.com/subscriptions.create",
+        "gcp.redisenterprise.com/subscriptions.delete",
+        "gcp.redisenterprise.com/subscriptions.get",
+        "gcp.redisenterprise.com/subscriptions.list",
+        "gcp.redisenterprise.com/subscriptions.update",
+        "gke.fleets.create",
+        "gke.fleets.delete",
+        "gke.fleets.get",
+        "gke.fleets.update",
+        "gkehub.fleet.create",
+        "gkehub.fleet.delete",
+        "gkehub.fleet.get",
+        "gkehub.fleet.update",
+        "iam.denypolicies.create",
+        "iam.denypolicies.delete",
+        "iam.denypolicies.replace",
+        "iam.denypolicies.update",
+        "iam.googleapis.com/denypolicies.create",
+        "iam.googleapis.com/denypolicies.delete",
+        "iam.googleapis.com/denypolicies.replace",
+        "iam.principalaccessboundarypolicies.bind",
+        "iam.principalaccessboundarypolicies.create",
+        "iam.principalaccessboundarypolicies.delete",
+        "iam.principalaccessboundarypolicies.unbind",
+        "iam.principalaccessboundarypolicies.update",
+        "orgpolicy.customConstraints.create",
+        "orgpolicy.customConstraints.delete",
+        "orgpolicy.customConstraints.update",
+        "orgpolicy.policies.create",
+        "orgpolicy.policies.delete",
+        "orgpolicy.policies.update",
+        "orgpolicy.policy.set",
+        "privilegedaccessmanager.settings.update",
+        "resourcesettings.settings.update",
+        "source.repos.update",
+        "stackdriver.projects.edit",
+        "storagetransfer.agentpools.report",
+        "storagetransfer.operations.assign",
+        "storagetransfer.operations.report",
+        "telcoautomation.edgeSlms.create"
+      ]
+      role_title = "IamManageDenyRole"
+      role_description    = "This role is a combination of Owner and Organization Administrator roles, but without IAM and Org Policy management permissions"
+      attached_to = ["group:gcp-customer-org-all-customer_admins@cpva.gcp.vssa.lt"]
     }
   }
-  # deny_policies = {
-  #   # restrict_delete_proj = {
-  #   #   parent       = local.organization_id
-  #   #   display_name = "Deny deleting projects except for admins"
-  #   #   name = "restrict_delete_proj"
-  #   #   rules = [
-  #   #     {
-  #   #       denied_principals    = ["principalSet://goog/public:all"]
-  #   #       exception_principals = ["principalSet://goog/group/project-admins@example.com"]
-  #   #       denied_permissions   = ["cloudresourcemanager.googleapis.com/projects.delete"]
-  #   #       # optional exception permissions, condition
-  #   #       denial_condition = {
-  #   #         title      = "Not for dev/test projects"
-  #   #         expression = "!resource.matchTag('env_tag_key', 'prod')"
-  #   #       }
-  #   #     }
-  #   #   ]
-  #   # }
-  #   # # another policy
-  #   # restrict_sa_keys = {
-  #   #   parent       = "projects/my-project-id"
-  #   #   display_name = "Restrict service account key creation"
-  #   #   name = "restrict_delete_proj"
-  #   #   rules = [
-  #   #     {
-  #   #       denied_principals  = ["principalSet://goog/group/devops@example.com"]
-  #   #       denied_permissions = ["iam.googleapis.com/serviceAccountKeys.create"]
-  #   #       # no exception or condition in this simple one
-  #   #     },
-  #   #     {
-  #   #       denied_principals    = ["principalSet://goog/public:all"]
-  #   #       denied_permissions   = ["iam.googleapis.com/serviceAccountKeys.delete"]
-  #   #       exception_principals = ["principalSet://goog/serviceAccount:special-sa@my-project-id.iam.gserviceaccount.com"]
-  #   #     }
-  #   #   ]
-  #   # }
-  # }
-
 }
 
 generate "provider" {

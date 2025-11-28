@@ -1,11 +1,3 @@
-Štai „README.md“ failo vertimas į lietuvių kalbą:
-
---- FAILO PRADŽIA README.md ---
-
-# **terraform-gcp**
-
-Terraform konfigūracija, skirta GCP
-
 # **Organizacijos kūrimas**
 
 ## **Diegimo tvarka**
@@ -112,7 +104,7 @@ Pirmiausia sukonfigūruosite „Terragrunt“, kad būsenos failas būtų saugom
 5. Pritaikykite konfigūraciją. Tai sukurs aplankus, projektus, GCS saugyklą ir IAM susiejimus.    
    ```terragrunt apply```
 
-   Patvirtinkite taikymą (apply), kai būsite paprašyti. Šis žingsnis sukurs GCS saugyklą ir kitus resursus.
+   Patvirtinkite ```yes``` taikymą (apply), kai būsite paprašyti. Šis žingsnis sukurs GCS saugyklą ir kitus resursus.
 
 6. Iš pritaikyto modulio išvesties (output) nusikopijuokite ```gcs_bucket_name``` ir ```seed_project_id```, kurių reikės kitame žingsnyje.
 
@@ -160,6 +152,7 @@ Dabar, kai GCS saugykla egzistuoja, galite perkelti savo vietinį būsenos fail�
 5. Jūsų būsena dabar yra GCS. Paleiskite `apply` dar kartą, kad įsitikintumėte, jog viskas sinchronizuota. Jokių pakeitimų neturėtų būti rodoma.  
    ```terragrunt apply```
 
+
 ## **Organizacija**
 
 ### **GCP organizacijos „Terragrunt“ diegimas (_org aplankas)**
@@ -182,7 +175,7 @@ Organizacijos aplanko kūrimo vietoje (`organization`) atidarykite ```root.hcl``
   * ```project_prefix``` - Trumpas eilutės priešdėlis, naudojamas generuojant naujų projektų ID.
   * ```default_budget_notification_project``` -  Projekto ID, kuriame yra „Pub/Sub“ tema (topic), naudojama gaunant pranešimus apie biudžetą. Biudžetai nustatomi atsiskaitymo paskyroje, o šis projektas suteikia mechanizmą („Pub/Sub“ temą) programiniams įspėjimams gauti, kai išlaidos viršija nustatytas ribas. Gali būti tas pats kaip „seed“ projektas.
 
-* Organizacijos aplanko kūrimo vietoje (`veriff_organization/_org`) atidarykite ```terragrunt.hcl``` ir atlikite pakeitimus: 
+* Organizacijos aplanko kūrimo vietoje (`4_Organization/organization/_org`) atidarykite ```terragrunt.hcl``` ir atlikite pakeitimus: 
   * ```locals``` blokas:
     * ```gcp_groups_roles``` - grupių priešdėlis (grupės pavadinimas iki @) su vaidmenų (roles), kuriuos reikia priskirti grupei, sąrašu.  
     * ```org_policies``` - organizacijos politikos konfigūracija.
@@ -192,7 +185,7 @@ Organizacijos aplanko kūrimo vietoje (`organization`) atidarykite ```root.hcl``
 
 ### **Aktyvios grupės ir vaidmenys**
 
-* **gcp-sre-org-admins**: Tai aukščiausių teisių grupė, skirta svetainės patikimumo inžinieriams (SRE) arba debesijos administratoriams.  
+* **gcp-customer-org-all-vssa_admins**: Tai yra super-administratorių grupė, turinti beveik neribotas teises valdyti visą organizaciją, jos struktūrą, saugumą ir finansus. 
   * roles/organizationAdmin  
   * roles/owner  
   * roles/resourcemanager.projectCreator  
@@ -200,10 +193,61 @@ Organizacijos aplanko kūrimo vietoje (`organization`) atidarykite ```root.hcl``
   * roles/billing.user  
   * roles/securitycenter.admin  
   * ...ir kiti aukšto lygio administraciniai vaidmenys.  
-* **gcp-infosec-org-viewer**: Ši grupė skirta informacijos saugumo komandai, kad ji galėtų audituoti ir stebėti organizaciją.  
-  * roles/viewer (Organizacijos lygio skaitymo teisės)  
-  * roles/securitycenter.admin (Valdyti „Security Command Center“)  
-  * roles/cloudsupport.admin (Valdyti pagalbos užklausas)
+
+* **gcp-customer-org-all-customer_admins**: Tai kliento administratorių grupė. Jie turi daug teisių valdyti savo resursus (tinklus, projektus), tačiau jiems apribotos teisės keisti pačią organizacijos struktūrą, politikas ar matyti finansinius duomenis (remiantis komentarais kode). 
+  * roles/compute.xpnAdmin: Gali administruoti Shared VPC tinklus.
+  * roles/resourcemanager.folderAdmin: Gali valdyti aplankų struktūrą (organizuoti savo projektus).
+  * roles/resourcemanager.projectCreator: Gali kurti naujus projektus.
+  * roles/securitycenter.admin: Gali matyti ir valdyti saugumo pranešimus.
+  * roles/cloudsupport.admin: Gali bendrauti su „Google“ technine pagalba.
+
+* **gcp-customer-org-all-customer_viewers**: Štai išsami šio „Terraform“ kodo analizė. Jame apibrėžiamos trys vartotojų grupės ir joms suteikiamos teisės (IAM roles) organizacijos lygiu.
+
+Žemiau pateikiu, ką tiksliai reiškia kiekviena rolė lietuvių kalba ir kokias galias ji suteikia.
+
+1. Grupė: gcp-customer-org-all-vssa_admins
+Tai yra super-administratorių grupė (tikriausiai paslaugų tiekėjo arba pagrindinės IT komandos), turinti beveik neribotas teises valdyti visą organizaciją, jos struktūrą, saugumą ir finansus.
+
+roles/billing.user (Billing Account User): Leidžia susieti projektus su mokėjimo sąskaita. Tai reiškia, kad jie gali kurti resursus, kurie kainuoja pinigus, priskirdami juos konkrečiam biudžetui.
+
+roles/compute.xpnAdmin (Compute Shared VPC Admin): Leidžia konfigūruoti „Shared VPC“. Tai tinklo sprendimas, kai vienas pagrindinis projektas valdo tinklą, o kiti projektai juo naudojasi.
+
+roles/resourcemanager.folderAdmin: Leidžia pilnai valdyti aplankus (Folders) – juos kurti, trinti, perkelti ir keisti jų teises. Aplankai naudojami projektams grupuoti.
+
+roles/iam.denyAdmin: Suteikia teisę kurti „Deny Policies“ (draudimo politikas). Tai aukšto lygio saugumo funkcija, leidžianti griežtai uždrausti tam tikrus veiksmus, nepriklausomai nuo to, kokias kitas teises vartotojas turi.
+
+roles/resourcemanager.organizationAdmin: Viena galingiausių rolių. Leidžia valdyti visą organizaciją, priskirti teises kitiems administratoriams ir matyti visą resursų hierarchiją.
+
+roles/orgpolicy.policyAdmin: Leidžia nustatyti organizacijos politikas (pvz., „galima kurti resursus tik Europoje“ arba „draudžiama naudoti viešus IP adresus“).
+
+roles/iam.organizationRoleAdmin: Leidžia kurti ir valdyti Custom Roles (nestandartines roles) visos organizacijos lygiu.
+
+roles/owner: Klasikinė, pati plačiausia rolė. Savininkas turi pilną prieigą prie visų resursų, gali valdyti prieigas ir trinti viską.
+
+roles/resourcemanager.projectCreator: Suteikia teisę kurti naujus projektus.
+
+roles/securitycenter.admin: Pilna prieiga prie „Security Center“. Leidžia matyti saugumo spragas, grėsmes ir konfigūruoti saugumo nustatymus.
+
+roles/cloudsupport.admin: Leidžia kurti ir valdyti techninės pagalbos (Google Support) užklausas.
+
+2. Grupė: gcp-customer-org-all-customer_admins
+Tai kliento administratorių grupė. Jie turi daug teisių valdyti savo resursus (tinklus, projektus), tačiau jiems apribotos teisės keisti pačią organizacijos struktūrą, politikas ar matyti finansinius duomenis (remiantis komentarais kode).
+
+roles/compute.xpnAdmin: Gali administruoti Shared VPC tinklus.
+
+roles/resourcemanager.folderAdmin: Gali valdyti aplankų struktūrą (organizuoti savo projektus).
+
+roles/resourcemanager.projectCreator: Gali kurti naujus projektus.
+
+roles/securitycenter.admin: Gali matyti ir valdyti saugumo pranešimus.
+
+roles/cloudsupport.admin: Gali bendrauti su „Google“ technine pagalba.
+
+Svarbus skirtumas: Ši grupė neturi roles/owner, roles/billing.user (pagal komentarą, tai tvarkoma atskirai), roles/resourcemanager.organizationAdmin ar roles/orgpolicy.policyAdmin. Tai reiškia, kad jie negali pakeisti fundamentalių organizacijos taisyklių ar perimti pilnos kontrolės iš tiekėjo.
+
+3. Grupė: gcp-customer-org-all-customer_viewers
+Tai stebėtojų grupė, skirta auditoriams arba vadovams, kuriems reikia tik matyti situaciją.
+  * roles/viewer: Suteikia „tik skaitymo“ (read-only) prieigą prie beveik visų resursų. Jie gali peržiūrėti konfigūracijas, bet negali nieko keisti, trinti ar kurti.
 
 ### **Organizacijos politika**
 
@@ -259,7 +303,7 @@ terragrunt import 'google_org_policy_policy.default["iam.allowedPolicyMemberDoma
 
 ### **Diegimo žingsniai**
 
-Norėdami pritaikyti šią konfigūraciją, vykdykite standartines „Terragrunt“ komandas iš katalogo (root/veriff_organization/_org), kuriame yra šis ```terragrunt.hcl``` failas:
+Norėdami pritaikyti šią konfigūraciją, vykdykite standartines „Terragrunt“ komandas iš katalogo (4_Organization/organization/_org), kuriame yra šis ```terragrunt.hcl``` failas:
 
 1. **Inicijuoti:**  
    ```terragrunt init```
@@ -279,48 +323,26 @@ Norėdami pritaikyti šią konfigūraciją, vykdykite standartines „Terragrunt
 #### **Pilnas failų struktūros pavyzdys**
 ```
 .  
-├── bu-ai-ml/  
+├── Env/  
 │   ├── _folder/  
-│   │   └── terragrunt.hcl  <-- Ši konfigūracija (Sukuria 'bu-ai-ml' aplanką)  
-│   ├── dev/
+│   │   └── terragrunt.hcl  <-- Ši konfigūracija (Sukuria 'Env' aplanką)  
+│   ├── Prod/
 │   │   └── _folder/
-│   │       └── terragrunt.hcl <-- Ši konfigūracija sukuria 'dev' aplanką 'bu-ai-ml' aplanko viduje 
-│   ├── prod/  
-│   └── staging/  
+│   │       └── terragrunt.hcl <-- Ši konfigūracija sukuria 'Prod' aplanką 'Env' aplanko viduje 
+│   ├── Test/  
 │  
-├── bu-core/  
-│   ├── _folder/  
-│   │   └── terragrunt.hcl  <-- Ši konfigūracija (Sukuria 'bu-core' aplanką)  
-│   └── eu/  
-│       ├── _folder/  <-- Ši konfigūracija (Sukuria 'eu' aplanką 'bu-core' aplanke) 
-│       ├── playground/
-│       │   └── _folder/  <-- Ši konfigūracija (Sukuria 'playground' aplanką 'eu' aplanke, esančiame 'bu-core' aplanke) 
-│       ├── prod/  
-│       ├── review/  
-│       ├── test/  
-│       └── us/  
+├── Infra/  
+│   └── _folder/  
+│       └── terragrunt.hcl  <-- Ši konfigūracija (Sukuria 'Infra' aplanką)  
 │  
-├── bu-data/  
-│   ├── _folder/  
-│   │   └── terragrunt.hcl  <-- Ši konfigūracija (Sukuria 'bu-data' aplanką)  
-│   ├── eu/  
-│   │   ├── _folder/  
-│   │   ├── dev/  
-│   │   ├── prod/  
-│   │   └── staging/  
-│   └── us/  
-│  
-└── Shared/  
-    └──  _folder/  
-        └── terragrunt.hcl  \<-- Ši konfigūracija (Sukuria 'Shared' aplanką)  
+└── Sandbox/  
+    └── _folder/  
+        └── terragrunt.hcl  <-- Ši konfigūracija (Sukuria 'Sandbox' aplanką)  
+ 
 ```
 
-Tiesiai po organizacija yra organizacijos pagrindiniai (root) aplankai (sukurti tiesiogiai po organizacija): bu-ai-ml, bu-core, bu-data ir Shared. Kiekvienas aplanko pavadinimas atitinka GCP Org aplankų pavadinimus.
-Kiekvienas iš pagrindinių aplankų turi skirtingus poaplankius (sub folders), sukurtus organizacijos aplankų viduje:
-* bu-ai-ml - turi skirtingus aplinkų poaplankius.
-* bu-core - turi ```us``` ir ```eu``` poaplankius. Jų viduje yra skirtingi poaplankiai skirtingoms aplinkoms.
-* bu-data - turi ```us``` ir ```eu``` poaplankius. Jų viduje yra skirtingi poaplankiai skirtingoms aplinkoms.
-* Shared - neturi jokių poaplankių, projektus galima kurti tiesiogiai jame.
+Tiesiai po organizacija yra organizacijos pagrindiniai (root) aplankai (sukurti tiesiogiai po organizacija): Env, Infra, Sandbox. Kiekvienas aplanko pavadinimas atitinka GCP Org aplankų pavadinimus.
+
 ---
 
 ### **Pagrindinio (Root) aplanko konfigūracija**
@@ -348,14 +370,14 @@ dependency "parent" {
 
 ### **Kaip naudoti (Diegimo eiga)**
 
-1. Norėdami sukurti naują aukščiausio lygio aplanką (pvz., bu-finance), sukurkite naują katalogą struktūros šaknyje: `mkdir bu-finance`.  
-2. Jo viduje sukurkite `_folder` katalogą: `mkdir bu-finance/_folder`.  
-3. Nukopijuokite `terragrunt.hcl` failą iš kito pagrindinio aplanko į `bu-finance/_folder` katalogą.
+1. Norėdami sukurti naują aukščiausio lygio aplanką (pvz., Uat), sukurkite naują katalogą struktūros šaknyje: `mkdir Uat`.  
+2. Jo viduje sukurkite `_folder` katalogą: `mkdir Uat/_folder`.  
+3. Nukopijuokite `terragrunt.hcl` failą iš kito pagrindinio aplanko į `Uat/_folder` katalogą.
 4. Atlikite pakeitimus pagal savo poreikius.
 5. Sukurkite poaplankių struktūrą. 
-6. Nueikite į katalogą: `cd bu-finance/`.  
+6. Nueikite į katalogą: `cd Uat/`.  
 7. Vykdykite ```terragrunt apply -all```.  
-8. „Terragrunt“ sukurs naują GCP aplanką pavadinimu `bu-finance` tiesiai po jūsų organizacija.
+8. „Terragrunt“ sukurs naują GCP aplanką pavadinimu `Uat` tiesiai po jūsų organizacija.
 
 ### **Diegimo žingsniai**
 
@@ -374,27 +396,23 @@ Galiausiai sukūrę visą struktūrą, pereikite per pagrindinius organizacijos 
 
 ### **Struktūra ir vieta**
 
-Šis konfigūracijos failas skirtas būti patalpintas kataloge pavadinimu `_project`. Šis `_project` katalogas savo ruožtu turi būti kataloge, kuris apibrėžia norimą GCP projekto pavadinimą. Pavyzdys: ```veriff_organization/Shared/veriff-glb-shared-logging/_project```. Šiame pavyzdyje organizacijos aplanke ```Shared``` bus sukurtas projektas ```veriff-glb-shared-logging```.
+Šis konfigūracijos failas skirtas būti patalpintas kataloge pavadinimu `_project`. Šis `_project` katalogas savo ruožtu turi būti kataloge, kuris apibrėžia norimą GCP projekto pavadinimą. Pavyzdys: ```4_Organization/organization/Infra/gc-prj-customer-infra-networking/_project```. Šiame pavyzdyje organizacijos aplanke ```Infra``` bus sukurtas projektas ```gc-prj-customer-infra-networking```.
 
 #### **Pilnas failų struktūros pavyzdys**
 ```
+```
 .  
-├── bu-ai-ml/  
+├── Env/  
 │   ├── _folder/  
-│   │   └── terragrunt.hcl  
-│   ├── dev/
-│   │   └── _folder/
-│   │       └── terragrunt.hcl
-│   ├── prod/  
-│   └── staging/  
+│   ├── Prod/
+│   ├── Test/  
 ...
-│  
-└── Shared/  
-    └──  _folder/  
-        └── terragrunt.hcl
-    └── veriff-glb-shared-logging/
+└── Infra/  
+    └── _folder/  
+    └── gc-prj-customer-infra-networking/
         └── _project/
-            └── terragrunt.hcl <-- Ši konfigūracija sukuria 'veriff-glb-shared-logging' projektą 'Shared' aplanke.
+            └── terragrunt.hcl <-- Ši konfigūracija sukuria 'gc-prj-customer-infra-networking' projektą 'infra' aplanke. 
+
 ```
 
 ### **Projekto konfigūracija**
@@ -408,10 +426,10 @@ Projekto pavadinimo sukūrimas priklausys nuo aplanko, kuriame patalpintas ```_p
 
 ### **Kaip naudoti (Diegimo eiga)**
 
-1. Norėdami sukurti naują projektą (pvz., veriff-glb-monitor), sukurkite naują katalogą ```veriff-glb-monitor``` su poaplankiu ```_project``` reikiamo organizacijos aplanko viduje. 
-2. Nukopijuokite `terragrunt.hcl` failą iš kito ```_project``` aplanko į ```veriff-glb-monitor/_project``` katalogą.
+1. Norėdami sukurti naują projektą (pvz., gc-prj-customer-infra-networking), sukurkite naują katalogą ```gc-prj-customer-infra-networking``` su poaplankiu ```_project``` reikiamo organizacijos aplanko viduje. 
+2. Nukopijuokite `terragrunt.hcl` failą iš kito ```_project``` aplanko į ```gc-prj-customer-infra-networking/_project``` katalogą.
 3. Atlikite pakeitimus pagal savo poreikius.
-4. Nueikite į katalogą ```veriff-glb-monitor/_project```.  
+4. Nueikite į katalogą ```gc-prj-customer-infra-networking/_project```.  
 5. Vykdykite ```terragrunt apply```.  
 6. „Terragrunt“ sukurs naują GCP projektą jūsų struktūroje ten, kur jį patalpinote.
 
@@ -434,12 +452,12 @@ Galiausiai sukūrę projektų katalogus, pereikite per juos po vieną ir vykdyki
 Jo pagrindinė paskirtis yra:
 
 * Nurodyti centrinį „Terraform“ modulį GCP atsiskaitymo valdymui.  
-* Dinamiškai sukurti keturis atskirus **GCP Biudžetus**, po vieną kiekvienam pagrindiniam verslo padalinio (BU) aplankui (bu-ai-ml, bu-core, bu-data, Shared).  
+* Dinamiškai sukurti keturis atskirus **GCP Biudžetus**, po vieną kiekvienam pagrindinių aplankų (Env, Infra, Sandbox).  
 * Sukonfigūruoti **pranešimų kanalus** (El. paštas ir „Slack“) biudžeto įspėjimams.  
 
 ### **Atsiskaitymo konfigūracija**
-Atsiskaitymo pranešimų konfigūracija patalpinta ```verif_organization``` katalogo ```_billing``` aplanko ```terraform.hcl``` faile.
-Yra sukonfigūruota priklausomybė (dependency) visiems pagrindiniams organizacijos aplankams, kuriems nustatome atsiskaitymo pranešimus. Mūsų atveju – bu-ai-ml, bu-core, bu-data, Shared.
+Atsiskaitymo pranešimų konfigūracija patalpinta ```organization``` katalogo ```_billing``` aplanko ```terraform.hcl``` faile.
+Yra sukonfigūruota priklausomybė (dependency) visiems pagrindiniams organizacijos aplankams, kuriems nustatome atsiskaitymo pranešimus. Mūsų atveju – Env, Infra, Sandbox.
 
 Pasiruošimas „Slack“ paslapties (secret) kūrimui aprašytas ```_billing``` aplanko ```Readme.md``` faile.
 Po pasiruošimo atnaujinkite įvestis (inputs) pagal poreikį.
@@ -480,13 +498,13 @@ Atlikę pakeitimus, nueikite į ```_billing``` aplanką ir vykdykite:
 3. **Pritaikyti:**  
    ```terragrunt apply```
 
-## **Žurnalų vedimas (Logging)**
+## **Žurnalų vedimas (Logging) Papidlomas darbas**
 Ši konfigūracija naudoja „cloud-foundation-fabric“ modulį, kad sukurtų **centralizuotą organizacijos lygio žurnalų rinktuvą (logging sink)**. Pagrindinis tikslas yra surinkti visus žurnalo įrašus iš kiekvieno projekto ir aplanko jūsų „Google Cloud“ organizacijoje ir nukreipti juos į vieną dedikuotą „Cloud Logging“ saugyklą centriniame žurnalų projekte.
 
 Šis metodas yra geriausia praktika saugumui, auditui ir atitikčiai užtikrinti, nes tai garantuoja, kad visi žurnalai yra agreguojami vienoje saugioje, valdomoje vietoje.
 
-### **Logging konfigūracija**
-Logging pranešimų konfigūracija patalpinta ```verif_organization``` katalogo ```_logging_``` aplanko ```terragrunt.hcl``` faile.
+### **Logging konfigūracija ()**
+Logging pranešimų konfigūracija patalpinta ```organization``` katalogo ```_logging_``` aplanko ```terragrunt.hcl``` faile.
 
 Atlikite pakeitimus pagal poreikį.
 Įvestys (Inputs):
