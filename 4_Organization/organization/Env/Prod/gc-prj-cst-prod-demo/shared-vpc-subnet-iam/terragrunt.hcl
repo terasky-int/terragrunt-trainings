@@ -3,7 +3,7 @@ terraform {
 }
 
 include "shared" {
-  path   = find_in_parent_folders()
+  path   = find_in_parent_folders("root.hcl")
   expose = true
 }
 
@@ -25,6 +25,11 @@ dependency "shared_vpc" {
   config_path = "../../../../Infra/gc-prj-cpva-infra-networking/shared-vpc"
 }
 
+locals{
+  folder = "infra"
+  env = "prod"
+}
+
 inputs = {
   host_project     = dependency.network_project.outputs.project_id 
   region = include.shared.locals.region
@@ -33,7 +38,7 @@ inputs = {
 
   members_by_subnetwork_and_role = {
     "compute-engine-default-service-account" = {
-      subnetwork = "gc-sub-ew3-cpva-infra-prod-01"
+      subnetwork = "${include.shared.locals.prefix}sub-${include.shared.locals.region_trigram}-${include.shared.locals.client_name}-${local.folder}-${local.env}-01"
       region     = include.shared.locals.region
       role       = "roles/compute.networkUser"
       member     = "serviceAccount:${dependency.project.outputs.number}-compute@developer.gserviceaccount.com"

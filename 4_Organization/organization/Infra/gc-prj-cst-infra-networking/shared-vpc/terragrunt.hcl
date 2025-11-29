@@ -1,6 +1,6 @@
 
 terraform {
-  source = "github.com/terasky-int/training-modules.git//checked-modules/shared-vpc"
+  source = "github.com/terasky-int/training-modules.git//modules/shared-vpc"
 }
 
 include "shared" {
@@ -17,9 +17,6 @@ dependency "project" {
 
 locals {
   folder = "infra"
-  prefix = "gc-"
-  region_trigram = "euw4"
-  client_name = "cst"
   env = "prod"
   glb_name = "global-${local.client_name}-${local.folder}-${local.env}"
   glb_name_region = "${local.region_trigram}-${local.client_name}-${local.folder}-${local.env}"

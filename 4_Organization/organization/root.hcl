@@ -23,4 +23,7 @@ locals {
   region                              = "europe-west4"
   project_prefix                      = ""
   default_budget_notification_project = "shared-terraform-seed-[random_number]"
+  prefix = "gc-"
+  region_trigram = "euw4"
+  client_name = "cst"
 }

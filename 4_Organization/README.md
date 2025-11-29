@@ -12,7 +12,7 @@
 
 ## **Būtinos sąlygos**
 
-Prieš pradėdami įsitikinkite, kad turite šiuos dalykus:
+Prieš pradėdami įsitikinkite, kad esate pasiruošę:
 
 1. **Įdiegti įrankiai:**  
    * [Terraform](https://www.terraform.io/downloads.html)  
@@ -69,89 +69,6 @@ Sprendimas yra dviejų žingsnių procesas:
 1. Pirmiausia diekite naudodami **vietinę** (local) sistemą resursams (įskaitant GCS saugyklą) sukurti.  
 2. Perkelkite „Terraform“ būseną iš vietinio disko į naujai sukurtą GCS saugyklą.
 
-#### **1 žingsnis: Pradinis diegimas (vietinė būsena)**
-
-Pirmiausia sukonfigūruosite „Terragrunt“, kad būsenos failas būtų saugomas jūsų vietiniame kompiuteryje.
-
-1. Faile `terragrunt.hcl` **užkomentuokite** visą `remote_state { ... }` bloką, skirtą `gcs`.  
-2. **Atkomentuokite** `remote_state { ... }` bloką, skirtą `local`.  
-   Jūsų failas turėtų atrodyti taip:  
-```
-   remote_state {
-     backend = "local"
-     config = {
-       path = "${path_relative_to_include()}/terraform.tfstate"
-     }
-     generate = {
-       path      = "backend.tf"
-       if_exists = "overwrite"
-     }
-   }
-   # remote_state {  
-   #   disable_dependency_optimization = true  
-   #   backend                         = "gcs"  
-   #   ...  
-   # }
-```
-3. Inicijuokite „Terragrunt“:
-
-   ```terragrunt init```
-
-4. Peržiūrėkite planą:  
-     
-   ```terragrunt plan```
-
-5. Pritaikykite konfigūraciją. Tai sukurs aplankus, projektus, GCS saugyklą ir IAM susiejimus.    
-   ```terragrunt apply```
-
-   Patvirtinkite ```yes``` taikymą (apply), kai būsite paprašyti. Šis žingsnis sukurs GCS saugyklą ir kitus resursus.
-
-6. Iš pritaikyto modulio išvesties (output) nusikopijuokite ```gcs_bucket_name``` ir ```seed_project_id```, kurių reikės kitame žingsnyje.
-
-#### **2 žingsnis: Būsenos perkėlimas į GCS**
-
-Dabar, kai GCS saugykla egzistuoja, galite perkelti savo vietinį būsenos failą (`terraform.tfstate`) į ją.
-
-1. Vėl redaguokite savo ```terragrunt.hcl``` failą.  
-2. **Užkomentuokite** `local` backend bloką.  
-3. **Atkomentuokite** `gcs` backend bloką ir atnaujinkite ```project``` naudodami ankstesnio žingsnio išvestį ```seed_project_id``` bei ```bucket``` naudodami ankstesnio žingsnio išvestį ```gcs_bucket_name```.  
-   Jūsų failas turėtų atrodyti kaip originalas:  
-```
-   # remote_state {
-   #   backend = "local"
-   #   config = {
-   #     path = "${path_relative_to_include()}/terraform.tfstate"
-   #   }
-   #   generate = {
-   #     path      = "backend.tf"
-   #     if_exists = "overwrite"
-   #   }
-   # }
-
-   remote_state {  
-     disable_dependency_optimization = true  
-     backend                         = "gcs"  
-     generate = {  
-       path      = "backend.tf"  
-       if_exists = "overwrite"  
-     }
-
-     config = {  
-       project  = "<reikšmė iš seed_project_id output>"  
-       location = "europe-west4"  
-       bucket   = "<reikšmė iš gcs_bucket_name output>"  
-       prefix   = "bootstrap/terraform.tfstate"  
-     }  
-   }
-```
-4. Vėl paleiskite init. „Terragrunt“ aptiks backend pakeitimą ir pasiūlys perkelti jūsų būseną.  
-   ```terragrunt init -migrate-state```
-
-   Terraform paklaus: „Do you want to copy the state from "local" to "gcs"?“  
-   Įveskite ```yes``` ir paspauskite Enter.  
-5. Jūsų būsena dabar yra GCS. Paleiskite `apply` dar kartą, kad įsitikintumėte, jog viskas sinchronizuota. Jokių pakeitimų neturėtų būti rodoma.  
-   ```terragrunt apply```
-
 
 ## **Organizacija**
 
@@ -176,11 +93,7 @@ Organizacijos aplanko kūrimo vietoje (`organization`) atidarykite ```root.hcl``
   * ```default_budget_notification_project``` -  Projekto ID, kuriame yra „Pub/Sub“ tema (topic), naudojama gaunant pranešimus apie biudžetą. Biudžetai nustatomi atsiskaitymo paskyroje, o šis projektas suteikia mechanizmą („Pub/Sub“ temą) programiniams įspėjimams gauti, kai išlaidos viršija nustatytas ribas. Gali būti tas pats kaip „seed“ projektas.
   * ```prefix``` - priešdėlis naudojamas resursams kurti.
   * ```region_trigram``` - sutrumpinimas regionui.
-  * ```client_name``` - : euw4 (sutrumpinimas regionui europe-west4).
-  * ```client_name``` - : euw4 (sutrumpinimas regionui europe-west4).
-client_name: cst (kliento kodas arba padalinio trumpinys).
-
-env: prod (aplinka – Production). 
+  * ```client_name``` - kliento pavadinimas kuris bus naudojamas resursų kūrimo pavadinimų kūrime.
 
 * Organizacijos aplanko kūrimo vietoje (`4_Organization/organization/_org`) atidarykite ```terragrunt.hcl``` ir atlikite pakeitimus: 
   * ```locals``` blokas:
@@ -308,19 +221,6 @@ terragrunt import 'google_org_policy_policy.default["iam.allowedPolicyMemberDoma
 * **Raktas:** team  
   * **Reikšmės:** devops, engineering, data, billing
 ---
-
-### **Diegimo žingsniai**
-
-Norėdami pritaikyti šią konfigūraciją, vykdykite standartines „Terragrunt“ komandas iš katalogo (4_Organization/organization/_org), kuriame yra šis ```terragrunt.hcl``` failas:
-
-1. **Inicijuoti:**  
-   ```terragrunt init```
-
-2. **Planuoti:**  
-   ```terragrunt plan```
-
-3. **Pritaikyti:**  
-   ```terragrunt apply```
 
 
 ## **Aplankai (Folders)**
@@ -459,7 +359,7 @@ Galiausiai sukūrę projektų katalogus, pereikite per juos po vieną ir vykdyki
 Jo pagrindinė paskirtis yra:
 
 * Nurodyti centrinį „Terraform“ modulį GCP atsiskaitymo valdymui.  
-* Dinamiškai sukurti keturis atskirus **GCP Biudžetus**, po vieną kiekvienam pagrindinių aplankų (Env, Infra, Sandbox).  
+* Dinamiškai sukurti  **GCP Biudžetą**, kuris praneštų apie išleidžiamą pinigų sumą.  
 * Sukonfigūruoti **pranešimų kanalus** (El. paštas ir „Slack“) biudžeto įspėjimams.  
 
 ### **Atsiskaitymo konfigūracija**
@@ -474,7 +374,7 @@ Po pasiruošimo atnaujinkite įvestis (inputs) pagal poreikį.
 `budgets` įvestis apibrėžia keturių biudžetų žemėlapį. Visi keturi vadovaujasi tuo pačiu modeliu:
 
 * **Pagrindinė savybė (amount):** use\_last\_period \= true. Tai sukuria **tempą sekantį biudžetą**. Vietoj fiksuotos sumos, einamojo mėnesio biudžetas automatiškai nustatomas pagal **viso praėjusio mėnesio išlaidas**.  
-* **Filtras (resource\_ancestors):** Kiekvienas biudžetas filtruojamas taip, kad būtų taikomas *tik* resursams, esantiems po konkrečiu Verslo Padalinio aplanku (pvz., dependency.bu-ai-ml.outputs.id).  
+* **Filtras (resource\_ancestors):** Kiekvienas biudžetas filtruojamas taip, kad būtų taikomas resursams, esantiems po konkrečiu aplanku, projektu ar organizacija.  
 * **Ribos (Thresholds):** Įspėjimai siunčiami, kai *einamosios* išlaidos pasiekia **75%** ir **100%** *praėjusio mėnesio* visų išlaidų.  
 * **Pranešimai (Notifications):** disable\_default\_iam\_recipients \= true sustabdo numatytuosius įspėjimus projektų savininkams/atsiskaitymo administratoriams. monitoring\_notification\_channels \= \["billing-admins"\] nukreipia visus įspėjimus *tik* į žemiau apibrėžtą pasirinktinį „billing-admins“ el. pašto kanalą.
 
@@ -491,19 +391,6 @@ Po pasiruošimo atnaujinkite įvestis (inputs) pagal poreikį.
   * Šį kanalą **naudoja** visi keturi aukščiau apibrėžti biudžetai.  
   * Jam reikia vietos rezervavimo reikšmės `email_address`.  
 * **project\_id:** Abu kanalai sukuriami konkrečiame GCP projekte, kuris paveldimas iš bendros konfigūracijos (include.shared.locals.default\_budget\_notification\_project).
-
-### **Diegimo žingsniai**
-
-Atlikę pakeitimus, nueikite į ```_billing``` aplanką ir vykdykite:
-
-1. **Inicijuoti:**  
-   ```terragrunt init```
-
-2. **Planuoti:**  
-   ```terragrunt plan```
-
-3. **Pritaikyti:**  
-   ```terragrunt apply```
 
 ## **Žurnalų vedimas (Logging) Papidlomas darbas**
 
@@ -545,22 +432,276 @@ Atlikę pakeitimus, nueikite į ```_logging``` aplanką ir vykdykite:
 3. **Pritaikyti:**  
    ```terragrunt apply```
 
-## **Perimetras**
+# **Praktinė užduotis**
 
-Ši dalis įdiegia „Google Cloud“ (GCP) resursų rinkinį, skirtą valdyti prieigą prie GCP konsolės.
+Sudiegsime organizaciją ir jai reikalingus resursus.
 
-Pagrindinis tikslas yra įgyvendinti **kontekstu paremtą prieigos politiką**, užtikrinant, kad tik konkretūs vartotojai (iš apibrėžtų „Google“ grupių), jungdamiesi iš konkrečių, patikimų IP adresų, galėtų gauti prieigą. Tai yra kritinė saugumo priemonė, greičiausiai įgyvendinta naudojant **GCP Access Context Manager**.
+## bootstrap (4_Organization/bootstrap)
 
-### **Perimetro konfigūracija**
-Atlikite pakeitimus pagal poreikį.
-Šios reikšmės apibrėžia prieigos politikos pagrindą.
+#### **1.Konfigūracija**
 
-* **whitelisted\_ips**: Sąrašas konkrečių IP adresų (CIDR formatu; /32 reiškia vieną IP). **Tik srautas iš šių IP** bus laikomas patikimu.  
-* **group\_emails**: Sąrašas „Google“ grupių el. pašto adresų. **Tik šių grupių nariams** bus suteikta prieiga.
+Turite redaguoti `terragrunt.hcl`, kad jis atitiktų jūsų organizacijos duomenis.
+
+Atnaujinkite šiuos kintamuosius `inputs = { ... }` bloke:
+
+* `org_id`: Pateiktas jūsų skaitmeninis GCP organizacijos ID.  
+* `billing_account`: Pateiktas Jūsų GCP atsiskaitymo paskyros (Billing Account) ID.
+* `group_org_admins`: Jūsų esamos „Org Admins“ grupės pilnas el. pašto adresas, kurį susikūrėte  (pvz. gcp-cst-org-all-vssa_admins@<prefix>.gcp.vssa.lt)
+* `org_project_creators`: Sąrašas esamų grupių el. paštų, kurioms turėtų būti leista kurti projektus organizacijoje. Prisidėkite savo GCP vartotoją formate: "user:aivaras.s@terasky.com"
+
+#### **2: Pradinis diegimas (vietinė būsena)**
+
+Pirmiausia sukonfigūruosite „Terragrunt“, kad būsenos failas būtų saugomas jūsų vietiniame kompiuteryje.
+
+1. Faile `terragrunt.hcl` **užkomentuokite** visą `remote_state { ... }` bloką, skirtą `gcs`.  
+2. **Atkomentuokite** `remote_state { ... }` bloką, skirtą `local`.  
+   Jūsų failas turėtų atrodyti taip:  
+```
+   remote_state {
+     backend = "local"
+     config = {
+       path = "${path_relative_to_include()}/terraform.tfstate"
+     }
+     generate = {
+       path      = "backend.tf"
+       if_exists = "overwrite"
+     }
+   }
+   # remote_state {  
+   #   disable_dependency_optimization = true  
+   #   backend                         = "gcs"  
+   #   ...  
+   # }
+```
+3. Inicijuokite „Terragrunt“:
+
+   ```terragrunt init```
+
+4. Peržiūrėkite planą:  
+     
+   ```terragrunt plan```
+
+5. Pritaikykite konfigūraciją. Tai sukurs aplankus, projektus, GCS saugyklą ir IAM susiejimus.    
+   ```terragrunt apply```
+
+   Patvirtinkite ```yes``` taikymą (apply), kai būsite paprašyti. Šis žingsnis sukurs GCS saugyklą ir kitus resursus.
+
+6. Iš pritaikyto modulio išvesties (output) nusikopijuokite ```gcs_bucket_name``` ir ```seed_project_id```, kurių reikės kitame žingsnyje.
+
+#### **3 žingsnis: Būsenos perkėlimas į GCS**
+
+Dabar, kai GCS saugykla egzistuoja, galite perkelti savo vietinį būsenos failą (`terraform.tfstate`) į ją.
+
+1. Vėl redaguokite savo ```terragrunt.hcl``` failą.  
+2. **Užkomentuokite** `local` backend bloką.  
+3. **Atkomentuokite** `gcs` backend bloką ir atnaujinkite ```project``` naudodami ankstesnio žingsnio išvestį ```seed_project_id``` bei ```bucket``` naudodami ankstesnio žingsnio išvestį ```gcs_bucket_name```.  
+   Jūsų failas turėtų atrodyti kaip originalas:  
+```
+   # remote_state {
+   #   backend = "local"
+   #   config = {
+   #     path = "${path_relative_to_include()}/terraform.tfstate"
+   #   }
+   #   generate = {
+   #     path      = "backend.tf"
+   #     if_exists = "overwrite"
+   #   }
+   # }
+
+   remote_state {  
+     disable_dependency_optimization = true  
+     backend                         = "gcs"  
+     generate = {  
+       path      = "backend.tf"  
+       if_exists = "overwrite"  
+     }
+
+     config = {  
+       project  = "<reikšmė iš seed_project_id output>"  
+       location = "europe-west4"  
+       bucket   = "<reikšmė iš gcs_bucket_name output>"  
+       prefix   = "bootstrap/terraform.tfstate"  
+     }  
+   }
+```
+4. Vėl paleiskite init. „Terragrunt“ aptiks backend pakeitimą ir pasiūlys perkelti jūsų būseną.  
+   ```terragrunt init -migrate-state```
+
+   Terraform paklaus: „Do you want to copy the state from "local" to "gcs"?“  
+   Įveskite ```yes``` ir paspauskite Enter.  
+5. Jūsų būsena dabar yra GCS. Paleiskite `apply` dar kartą, kad įsitikintumėte, jog viskas sinchronizuota. Jokių pakeitimų neturėtų būti rodoma.  
+   ```terragrunt apply```
+
+## Organizacija (4_Organization/_org)
+
+#### **1.Konfigūracija**
+
+Organizacijos aplanko kūrimo vietoje (`4_Organization/organization`) atidarykite ```root.hcl``` ir atlikite pakeitimus:
+* Atnaujinkite ```remote_state``` bloką:
+  * ```project``` - iš bootstap modulio išvesties gautas ```seed_project_id```
+  * ```bucket``` - iš bootstap modulio išvesties gautas ```gcs_bucket_name```
+* Atnaujinkite ```locals``` bloko kintamuosius:
+  * ```organization_id``` - Toks pats Organizacijos id, kuris buvo suvestas į ```bootstrap```.
+  * ```billing_account``` - Toks pats Billing account id, kuris buvo suvestas į ```bootstrap```modulį
+  * ```quota_project``` -  iš bootstap modulio išvesties gautas ```seed_project_id```
+  * ```organization_domain``` - Organizacijos domain'as kurį sukūrėte su Aivaru T. <prefix>.
+  * ```region``` -  "europe-west4"
+  * ```project_prefix``` - Paliekame tuščią.
+  * ```default_budget_notification_project``` -  iš bootstap modulio išvesties gautas ```seed_project_id```
+  * ```prefix``` - nurodome "gc-"
+  * ```region_trigram``` - "euw4"
+  * ```client_name``` - "cst"
+
+ Organizacijos aplanko kūrimo vietoje (`4_Organization/organization/_org`) atidarykite ```terragrunt.hcl``` ir peržiūrėkite/atlikite pakeitimus: 
+  * ```locals``` blokas:
+    * ```gcp_groups_roles``` - nurodykite grupių pavadinimų priešdėlius (iki @) kuriuos sukūrėte su Aivaru T.
+    * ```org_policies``` - peržiūrėkite organizacijos politikos konfigūracija.
+    * ```custom_roles``` - palikite užkomentuotą
+  * ```inputs``` blokas:
+    * ```tags``` - žymų (tags) konfigūracija. peržiūrėkite ir jei norite, atkomentuokite.
+
+#### **2.Diegimo žingsniai**
+
+Norėdami pritaikyti šią konfigūraciją, vykdykite standartines „Terragrunt“ komandas iš katalogo (4_Organization/organization/_org), kuriame yra šis ```terragrunt.hcl``` failas:
+
+1. **Inicijuoti:**  
+   ```terragrunt init```
+
+2. **Planuoti:**  
+   ```terragrunt plan```
+
+3. **Pritaikyti:**  
+   ```terragrunt apply```
+
+## Sandbox (4_Organization/Sandbox)
+
+#### **1.Konfigūracija**
+
+ Sandbox aplanko kūrimo vietoje (`4_Organization/organization/Sandbox/_folder`) atidarykite ```terragrunt.hcl``` ir peržiūrėkite konfigūraciją.
+
+#### **2.Diegimo žingsniai**
+
+Norėdami pritaikyti šios direktorijos konfigūraciją, vykdykite standartines „Terragrunt“ komandas iš katalogo (4_Organization/organization/Sandbox):
+
+1. **Inicijuoti:**  
+   ```terragrunt init -all```
+
+2. **Planuoti:**  
+   ```terragrunt plan -all```
+
+3. **Pritaikyti:**  
+   ```terragrunt apply -all```
+
+## Infra (4_Organization/Infra)
+
+#### **1.Konfigūracija**
+##### ```Infra``` direktorijos konfigūracija
+ Infra aplanko kūrimo vietoje (`4_Organization/organization/Infra/_folder`) atidarykite ```terragrunt.hcl``` ir peržiūrėkite konfigūraciją.
+
+##### ```gc-prj-cst-infra-networking``` projekto konfigūracija
+
+ ```gc-prj-cst-infra-networking``` projekto kūrimo vietoje (`4_Organization/organization/Infra/gc-prj-cst-infra-networking/_project`) atidarykite ```terragrunt.hcl``` ir peržiūrėkite konfigūraciją.
+
+ **Atkreipkite dėmesį į services ir labels blokus.**
+
+##### vpc konfigūracija ```gc-prj-cst-infra-networking``` projekto viduje
+ gc-prj-cst-infra-networking vpc kūrimo vietoje (`4_Organization/organization/Infra/gc-prj-cst-infra-networking/shared-vpc`) atidarykite ```terragrunt.hcl``` ir peržiūrėkite/atlikite pakeitimus: 
+  * ```locals``` blokas:
+    * ```folder``` - "infra"
+    * ```env``` - "prod"
+    * ```glb_name``` - tai yra generuojamų vardų kitamasis pagal kurį VPC globalūs resursai bus kuriami.
+    * ```glb_name_region``` - tai yra generuojamų vardų kitamasis pagal kurį VPC regioniniai resursai bus kuriami.
+    * ```vpc_name``` - VPC vardo generavimas
+  * ```inputs``` blokas:
+    * ```subnets``` :
+      * ```ip_cidr_range```- tai yra mūsų subnet'o konfigūraciją, kurią vėliau naudos klientas. Pakeiskite į "10.207.255.160/27"
+    * ```ìngress_rules``` - tai įeinančio srauto ungniasienės taisyklės, jei reikėtų ateityje konfigūruoti praleidimus. Palikite užkomentuotą.
+    * ```egress_rules``` - tai įeinančio srauto ungniasienės taisyklės, jei reikėtų ateityje konfigūruoti praleidimus. Palikite užkomentuotą.
+
+#### **2.Diegimo žingsniai**
+
+Norėdami pritaikyti šios direktorijos konfigūraciją, vykdykite standartines „Terragrunt“ komandas iš katalogo (4_Organization/organization/Infra):
+
+1. **Inicijuoti:**  
+   ```terragrunt init -all```
+
+2. **Planuoti:**  
+   ```terragrunt plan -all```
+
+3. **Pritaikyti:**  
+   ```terragrunt apply -all```
+
+**SVARBU**
+Išsisaugokite VPC konfigūraciją, ją naudosime kai reikės kurti resursus kaip klientui.
+Reikia išsisaugoti šiuos išvesties kintamuosius:
+* ```vpc_self_link```
+* ```vpc_subnet_links```
+
+Norint juos dar kartą pažiūrėti galima, nunavigavus į shared-vpc direktoriją (`4_Organization/organization/Infra/gc-prj-cst-infra-networking/shared-vpc`) ir paleidus komandą:
+```terragrunt output```
+
+## Env (4_Organization/Env)
+
+#### **1.Konfigūracija**
+##### ```Env``` direktorijos konfigūracija
+ Infra aplanko kūrimo vietoje (`4_Organization/organization/Env/_folder`) atidarykite ```terragrunt.hcl``` ir peržiūrėkite konfigūraciją.
+
+ ##### ```Test``` direktorijos konfigūracija
+ Infra aplanko kūrimo vietoje (`4_Organization/organization/Env/Test/_folder`) atidarykite ```terragrunt.hcl``` ir peržiūrėkite konfigūraciją.
+
+  ##### ```Prod``` direktorijos konfigūracija
+ Infra aplanko kūrimo vietoje (`4_Organization/organization/Env/Prod/_folder`) atidarykite ```terragrunt.hcl``` ir peržiūrėkite konfigūraciją.
+
+##### ```gc-prj-cst-prod-demo``` projekto konfigūracija
+
+ ```gc-prj-cst-prod-demo``` projekto kūrimo vietoje (`4_Organization/organization/Env/Prod/gc-prj-cst-prod-demo/_project`) atidarykite ```terragrunt.hcl``` ir peržiūrėkite konfigūraciją.
+
+ **Atkreipkite dėmesį į services ir labels blokus.**
+
+##### shared-vpc-subnet-iam (pridėjimas prie shared vpc) konfigūracija 
+
+ shared-vpc-subnet-iam kūrimo vietoje (`4_Organization/organization/Env/Prod/gc-prj-cst-prod-demo/shared-vpc-subnet-iam`) atidarykite ```terragrunt.hcl``` ir peržiūrėkite/atlikite pakeitimus: 
+  * ```locals``` blokas:
+    * ```folder``` - "infra"
+    * ```env``` - "prod"
+
+  * ```inputs``` blokas:
+    * ```members_by_subnetwork_and_role``` :
+      * ```compute-engine-default-service-account```- čia mes nurodome, kad šio projekto, numatyto Compute Engine service account duosime teises naudotis shared-vpc su role ```roles/compute.networkUser```
+
+#### **2.Diegimo žingsniai**
+
+Norėdami pritaikyti šios direktorijos konfigūraciją, vykdykite standartines „Terragrunt“ komandas iš katalogo (4_Organization/organization/Env):
+
+1. **Inicijuoti:**  
+   ```terragrunt init -all```
+
+2. **Planuoti:**  
+   ```terragrunt plan -all```
+
+3. **Pritaikyti:**  
+   ```terragrunt apply -all```
+
+
+## Biudžeta (4_Organization/_billing)
+
+#### **1.Konfigūracija**
+##### ```_billing``` direktorijos konfigūracija
+ Infra aplanko kūrimo vietoje (`4_Organization/_billing`) atidarykite ```terragrunt.hcl``` ir peržiūrėkite/atlikite pakeitimus: 
+  * ```inputs``` blokas:
+    * ```budget_notification_channels``` blokas:
+      * ```billing-admins``` blokas:
+        * ```labels``` blokas:
+          * ```email_address```- nurodykite savo administratorių grupės adresą.
+    "infra"
+    * ```budgets``` blokas:
+      * ```organization-month-current```- pakeiskite pavadinimą į ```prod-month-current````
+      * ```filter```blokas:
+        * ```resource_ancestors``` - pakeiskite į [dependency.Prod.outputs.id]
 
 ### **Diegimo žingsniai**
 
-Atlikę pakeitimus, nueikite į ```_perimeter``` aplanką ir vykdykite:
+Atlikę pakeitimus, nueikite į ```_billing``` aplanką ir vykdykite:
 
 1. **Inicijuoti:**  
    ```terragrunt init```

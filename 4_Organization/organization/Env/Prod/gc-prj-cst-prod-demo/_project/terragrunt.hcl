@@ -1,5 +1,5 @@
 include "shared" {
-  path   = find_in_parent_folders()
+  path   = find_in_parent_folders("root.hcl")
   expose = true
 }
 
@@ -33,7 +33,7 @@ inputs = {
   tag_bindings          = {}
   labels = {
     environment = "prod",
-    service = "future-web",
+    service = "demo",
     owner = "vssa_admins"
     }
 }

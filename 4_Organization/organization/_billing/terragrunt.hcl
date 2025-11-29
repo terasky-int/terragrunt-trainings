@@ -1,5 +1,5 @@
 terraform {
-  source = "github.com/terasky-int/tsb-tf-modules.git//modules/billing-account"
+  source = "github.com/terasky-int/training-modules.git//modules/billing-account"
 }
 
 # Include common configuration
@@ -16,8 +16,8 @@ dependency "Sandbox" {
   config_path = "../Sandbox/_folder"
 }
 
-dependency "Env" {
-  config_path = "../Env/_folder"
+dependency "Prod" {
+  config_path = "../Env/Prod/_folder"
 }
 
 dependencies {
