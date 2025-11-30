@@ -11,7 +11,7 @@ dependency "folder" {
   config_path = "../../_folder"
   mock_outputs = {
     id = "folders/12345678910"
-  }  
+  }
 }
 
 inputs = {
@@ -24,7 +24,9 @@ inputs = {
     "billingbudgets.googleapis.com",
     "orgpolicy.googleapis.com",
     "networkconnectivity.googleapis.com",
-    "logging.googleapis.com"
+    "logging.googleapis.com",
+    "secretmanager.googleapis.com",
+    "container.googleapis.com"
 
   ]
   iam                   = {}
@@ -33,7 +35,7 @@ inputs = {
   tag_bindings          = {}
   labels = {
     environment = "infra",
-    service = "networking",
-    owner = "vssa_admins"
-    }
+    service     = "networking",
+    owner       = "vssa_admins"
+  }
 }

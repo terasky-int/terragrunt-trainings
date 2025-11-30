@@ -1,0 +1,7 @@
+region: "europe-west4"
+region_trigram: "euw4"
+location: "europe-west4"
+project: "<project id>"
+project_id: "<project id>"
+vpc: "<vpc_self_link>"
+subnet: "<vpc_subnet_links = {'europe-west4/gc-sub-euw4-cst-infra-prod-01'}>"

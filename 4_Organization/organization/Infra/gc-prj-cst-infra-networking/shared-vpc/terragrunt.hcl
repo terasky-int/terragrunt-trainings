@@ -12,44 +12,48 @@ dependency "project" {
   config_path = "../_project"
   mock_outputs = {
     project_id = "12345678910"
-  }  
+  }
 }
 
 locals {
-  folder = "infra"
-  env = "prod"
-  glb_name = "global-${local.client_name}-${local.folder}-${local.env}"
+  folder          = "infra"
+  env             = "prod"
+  glb_name        = "global-${local.client_name}-${local.folder}-${local.env}"
   glb_name_region = "${local.region_trigram}-${local.client_name}-${local.folder}-${local.env}"
-  vpc_name = "${local.prefix}vpc-${local.glb_name}-01"
+  vpc_name        = "${include.shared.locals.prefix}vpc-${local.glb_name}-01"
   #shared_vpc_service_projects = [""]
 }
 
 inputs = {
   vpc_name = local.vpc_name
   #shared_vpc_service_projects = local.shared_vpc_service_projects
-  project = dependency.project.outputs.project_id
-  region = include.shared.locals.region
+  project                  = dependency.project.outputs.project_id
+  region                   = include.shared.locals.region
   create_googleapis_routes = {}
   subnets = [
     {
-      name          = "${local.prefix}sub-${local.glb_name_region}-01"
+      name          = "${include.shared.locals.prefix}sub-${local.glb_name_region}-01"
       ip_cidr_range = "10.207.255.128/27"
       region        = include.shared.locals.region # europe-west3
       description   = ""
+      secondary_ip_ranges = {
+        "${include.shared.locals.prefix}sub-${local.glb_name_region}-01-pods" = "10.136.128.0/17"
+        "${include.shared.locals.prefix}sub-${local.glb_name_region}-01-svc"  = "10.136.16.0/20"
+      }
     },
   ]
   shared_vpc_host = true
   external_addresses = {
-    "${local.prefix}nat-eip-${local.glb_name_region}-01" = include.shared.locals.region
+    "${include.shared.locals.prefix}nat-eip-${local.glb_name_region}-01" = include.shared.locals.region
   }
 
   cloud_nat = [
     {
-      name                                = "${local.prefix}nat-${local.glb_name_region}-01"
+      name                                = "${include.shared.locals.prefix}nat-${local.glb_name_region}-01"
       region                              = include.shared.locals.region
-      external_address_name               = "${local.prefix}nat-eip-${local.glb_name_region}-01"
+      external_address_name               = "${include.shared.locals.prefix}nat-eip-${local.glb_name_region}-01"
       router_create                       = true
-      router_name                         = "${local.prefix}rtr-eip-${local.glb_name_region}-01"
+      router_name                         = "${include.shared.locals.prefix}rtr-eip-${local.glb_name_region}-01"
       router_network                      = local.vpc_name
       router_bgp_asn                      = 65000
       router_bgp_advertise_mode           = "DEFAULT"

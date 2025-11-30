@@ -598,14 +598,16 @@ Norėdami pritaikyti šios direktorijos konfigūraciją, vykdykite standartines 
 ##### ```Infra``` direktorijos konfigūracija
  Infra aplanko kūrimo vietoje (`4_Organization/organization/Infra/_folder`) atidarykite ```terragrunt.hcl``` ir peržiūrėkite konfigūraciją.
 
-##### ```gc-prj-cst-infra-networking``` projekto konfigūracija
+##### ```gc-prj-cst-infra-networking-<sufix>``` projekto konfigūracija
 
- ```gc-prj-cst-infra-networking``` projekto kūrimo vietoje (`4_Organization/organization/Infra/gc-prj-cst-infra-networking/_project`) atidarykite ```terragrunt.hcl``` ir peržiūrėkite konfigūraciją.
+**Svarbu** pakeisti direktorijos ```gc-prj-cst-infra-networking``` vardą pridedant gale "-<vardo primos dvi raidės ir paradės primos 3 raides>" pvz. ```gc-prj-cst-infra-networking-aisuk```
+
+ ```gc-prj-cst-infra-networking-<sufix>``` projekto kūrimo vietoje (`4_Organization/organization/Infra/gc-prj-cst-infra-networking-<sufix>/_project`) atidarykite ```terragrunt.hcl``` ir peržiūrėkite konfigūraciją.
 
  **Atkreipkite dėmesį į services ir labels blokus.**
 
-##### vpc konfigūracija ```gc-prj-cst-infra-networking``` projekto viduje
- gc-prj-cst-infra-networking vpc kūrimo vietoje (`4_Organization/organization/Infra/gc-prj-cst-infra-networking/shared-vpc`) atidarykite ```terragrunt.hcl``` ir peržiūrėkite/atlikite pakeitimus: 
+##### vpc konfigūracija ```gc-prj-cst-infra-networking-<sufix>``` projekto viduje
+ gc-prj-cst-infra-networking-<sufix> vpc kūrimo vietoje (`4_Organization/organization/Infra/gc-prj-cst-infra-networking-<sufix>/shared-vpc`) atidarykite ```terragrunt.hcl``` ir peržiūrėkite/atlikite pakeitimus: 
   * ```locals``` blokas:
     * ```folder``` - "infra"
     * ```env``` - "prod"
@@ -614,7 +616,8 @@ Norėdami pritaikyti šios direktorijos konfigūraciją, vykdykite standartines 
     * ```vpc_name``` - VPC vardo generavimas
   * ```inputs``` blokas:
     * ```subnets``` :
-      * ```ip_cidr_range```- tai yra mūsų subnet'o konfigūraciją, kurią vėliau naudos klientas. Pakeiskite į "10.207.255.160/27"
+      * ```ip_cidr_range```- tai yra mūsų subnet'o konfigūraciją, kurią vėliau naudos klientas. Pakeiskite į "10.205.255.0/24"
+      * `secondary_ip_ranges` - tai antriniai ip adresai, kurie vėliau bus naudojami GKE klasteriui. Palikite kaip yra.
     * ```ìngress_rules``` - tai įeinančio srauto ungniasienės taisyklės, jei reikėtų ateityje konfigūruoti praleidimus. Palikite užkomentuotą.
     * ```egress_rules``` - tai įeinančio srauto ungniasienės taisyklės, jei reikėtų ateityje konfigūruoti praleidimus. Palikite užkomentuotą.
 
@@ -637,7 +640,7 @@ Reikia išsisaugoti šiuos išvesties kintamuosius:
 * ```vpc_self_link```
 * ```vpc_subnet_links```
 
-Norint juos dar kartą pažiūrėti galima, nunavigavus į shared-vpc direktoriją (`4_Organization/organization/Infra/gc-prj-cst-infra-networking/shared-vpc`) ir paleidus komandą:
+Norint juos dar kartą pažiūrėti galima, nunavigavus į shared-vpc direktoriją (`4_Organization/organization/Infra/gc-prj-cst-infra-networking-<sufix>/shared-vpc`) ir paleidus komandą:
 ```terragrunt output```
 
 ## Env (4_Organization/Env)
@@ -652,22 +655,26 @@ Norint juos dar kartą pažiūrėti galima, nunavigavus į shared-vpc direktorij
   ##### ```Prod``` direktorijos konfigūracija
  Infra aplanko kūrimo vietoje (`4_Organization/organization/Env/Prod/_folder`) atidarykite ```terragrunt.hcl``` ir peržiūrėkite konfigūraciją.
 
-##### ```gc-prj-cst-prod-demo``` projekto konfigūracija
+##### ```gc-prj-cst-prod-demo-<sufix>``` projekto konfigūracija
 
- ```gc-prj-cst-prod-demo``` projekto kūrimo vietoje (`4_Organization/organization/Env/Prod/gc-prj-cst-prod-demo/_project`) atidarykite ```terragrunt.hcl``` ir peržiūrėkite konfigūraciją.
+**Svarbu** pakeisti direktorijos ```gc-prj-cst-prod-demo``` vardą pridedant gale "-<vardo primos dvi raidės ir paradės primos 3 raides>" pvz. ```gc-prj-cst-prod-demo-aisuk```
+
+
+ ```gc-prj-cst-prod-demo-<sufix>``` projekto kūrimo vietoje (`4_Organization/organization/Env/Prod/gc-prj-cst-prod-demo-<sufix>/_project`) atidarykite ```terragrunt.hcl``` ir peržiūrėkite konfigūraciją.
 
  **Atkreipkite dėmesį į services ir labels blokus.**
 
 ##### shared-vpc-subnet-iam (pridėjimas prie shared vpc) konfigūracija 
 
- shared-vpc-subnet-iam kūrimo vietoje (`4_Organization/organization/Env/Prod/gc-prj-cst-prod-demo/shared-vpc-subnet-iam`) atidarykite ```terragrunt.hcl``` ir peržiūrėkite/atlikite pakeitimus: 
+ shared-vpc-subnet-iam kūrimo vietoje (`4_Organization/organization/Env/Prod/gc-prj-cst-prod-demo-<sufix>/shared-vpc-subnet-iam`) atidarykite ```terragrunt.hcl``` ir peržiūrėkite/atlikite pakeitimus: 
   * ```locals``` blokas:
     * ```folder``` - "infra"
     * ```env``` - "prod"
 
   * ```inputs``` blokas:
     * ```members_by_subnetwork_and_role``` :
-      * ```compute-engine-default-service-account```- čia mes nurodome, kad šio projekto, numatyto Compute Engine service account duosime teises naudotis shared-vpc su role ```roles/compute.networkUser```
+      * ```compute-engine-default-service-account```- čia mes nurodome, kad šio projekto, numatyto Compute Engine service account duosime teises naudotis shared-vpc su role ```roles/compute.networkUser```, tam kad galėtumėm prijungti jį prie shared vpc.
+      * ```cloud-run-service-account```- čia mes nurodome, kad šio projekto, numatyto Cloud Run service account duosime teises naudotis shared-vpc su role ```roles/compute.networkUser```, tam kad galėtumėm prijungti jį prie shared vpc.
 
 #### **2.Diegimo žingsniai**
 
@@ -682,8 +689,10 @@ Norėdami pritaikyti šios direktorijos konfigūraciją, vykdykite standartines 
 3. **Pritaikyti:**  
    ```terragrunt apply -all```
 
+**SVARBU** Šiame žingsnyje gali nepavykti viską "gražiai" sudiegti. Turėtumėt gauti klaidą `Error: Error creating Policy: googleapi: Error 409: Requested entity already exists"`. Teks suimportuoti egzistuojančias politikas ir jas pakeisti. Tad reikia padaryti pakeitimus. Kaip tai padaryti galite rasti `4_Organization` direktorijoje esančiame README.md faile. (Hint: jame paieškokit `409`).
 
-## Biudžeta (4_Organization/_billing)
+
+## Biudžetas (4_Organization/_billing)
 
 #### **1.Konfigūracija**
 ##### ```_billing``` direktorijos konfigūracija

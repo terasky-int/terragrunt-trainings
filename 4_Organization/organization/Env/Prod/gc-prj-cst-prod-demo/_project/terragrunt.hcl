@@ -11,7 +11,7 @@ dependency "folder" {
   config_path = "../../_folder"
   mock_outputs = {
     id = "folders/12345678910"
-  } 
+  }
 }
 
 inputs = {
@@ -24,16 +24,39 @@ inputs = {
     "billingbudgets.googleapis.com",
     "orgpolicy.googleapis.com",
     "networkconnectivity.googleapis.com",
-    "logging.googleapis.com"
+    "logging.googleapis.com",
+    "secretmanager.googleapis.com",
+    "run.googleapis.com",
+    "container.googleapis.com"
 
   ]
   iam                   = {}
   iam_bindings_additive = {}
-  org_policies          = {}
-  tag_bindings          = {}
+  org_policies = {
+    "run.managed.requireInvokerIam" = { rules = [{ enforce = false }] } # Requires IAM for Cloud Run invoker role
+    "iam.allowedPolicyMemberDomains" = {                                # Requested entity already exists
+      rules = [{
+        allow_all = "TRUE"
+      }]
+    }
+  }
+  tag_bindings = {}
   labels = {
     environment = "prod",
-    service = "demo",
-    owner = "vssa_admins"
-    }
+    service     = "demo",
+    owner       = "vssa_admins"
+  }
+}
+
+generate "provider" {
+  path      = "provider.tf"
+  if_exists = "overwrite_terragrunt" # Important: Terragrunt will manage this file
+  contents  = <<EOF
+provider "google" {
+  project               = "${include.shared.locals.quota_project}"
+  billing_project       = "${include.shared.locals.quota_project}"
+  user_project_override = true
+  region                = "${include.shared.locals.region}"
+}
+EOF
 }

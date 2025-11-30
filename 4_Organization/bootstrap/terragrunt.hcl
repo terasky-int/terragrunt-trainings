@@ -1,14 +1,14 @@
 # Terragrunt configuration for the bootstrap module
 
 remote_state {
- backend = "local"
- config = {
-   path = "${path_relative_to_include()}/terraform.tfstate"
- }
- generate = {
-   path      = "backend.tf"
-   if_exists = "overwrite"
- }
+  backend = "local"
+  config = {
+    path = "${path_relative_to_include()}/terraform.tfstate"
+  }
+  generate = {
+    path      = "backend.tf"
+    if_exists = "overwrite"
+  }
 }
 
 # remote_state {
@@ -43,7 +43,7 @@ inputs = {
     create_optional_groups = false # Set to true if you want to create optional groups
     billing_project        = null  # Provide a billing project ID if creating groups
     required_groups = {
-      group_org_admins     = "gcp-organization-admins@example.com" # Replace with actual group email
+      group_org_admins = "gcp-organization-admins@example.com" # Replace with actual group email
       # group_billing_admins = "gcp-billing-admins@example.com"      # Replace with actual group email
     }
   }
@@ -62,5 +62,5 @@ inputs = {
   folder_deletion_protection       = true
 
   # Additional project creators (if needed)
-  org_project_creators = ["group:terasky-baltic-engineers@example.com","user:aivaras.s@terasky.com"] # e.g. ["group:gcp-project-creators@example.com"]
+  org_project_creators = ["group:terasky-baltic-engineers@example.com", "user:aivaras.s@terasky.com"] # e.g. ["group:gcp-project-creators@example.com"]
 }

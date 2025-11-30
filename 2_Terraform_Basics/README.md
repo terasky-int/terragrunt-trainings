@@ -88,7 +88,7 @@ Tai yra Terraform „atmintis“. Be jos Terraform nežinotų, ką jau sukūrė.
 3. Užpildyti ```terraform.tfvars``` failą:
 - Project: ```aivaras-s-sandbox```
 - Region: ```europe-west3```
-- bucket_name: ```<vardas>_<pavarde>_<data be tarpų>```
+- bucket_name: ```<vardas>-<pavarde>-<data be tarpų>```
 - bucket_location: europe-west3.  
 **Svarbu:** bucket\_name turi būti **unikalus visame pasaulyje** (ne tik jūsų projekte). Jei toks vardas jau egzistuoja pas kitą Google vartotoją, gausite klaidą. Rekomenduojama naudoti mažąsias raides, skaičius, brūkšnius (-) arba pabraukimus (\_).
 4. Išsaugoti pakeitimus ```terraform.tfvars``` faile.

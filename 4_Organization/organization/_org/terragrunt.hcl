@@ -5,9 +5,9 @@ locals {
   gcp_groups_roles = {
 
     "gcp-customer-org-all-vssa_admins" = [
-      "roles/billing.user",                      # Billing Account User
-      "roles/compute.xpnAdmin",                  # Compute Shared VPC Admin
-      "roles/resourcemanager.folderAdmin",       # Folder Admin
+      "roles/billing.user",                # Billing Account User
+      "roles/compute.xpnAdmin",            # Compute Shared VPC Admin
+      "roles/resourcemanager.folderAdmin", # Folder Admin
       "roles/iam.denyAdmin",
       "roles/resourcemanager.organizationAdmin", # Organization Administrator
       "roles/orgpolicy.policyAdmin",             # Organization Policy Administrator
@@ -21,11 +21,11 @@ locals {
     "gcp-customer-org-all-customer_admins" = [
       #"roles/billing.user",                      # Billing Account User will be granted on the Billing Account itself which belongs to the reseller
       #"roles/billing.viewer",                    # Billing Account Viewer will be granted on the Billing Account itself which belongs to the reseller
-      "roles/compute.xpnAdmin",                  # Compute Shared VPC Admin
-      "roles/resourcemanager.folderAdmin",       # Folder Admin
-      "roles/resourcemanager.projectCreator",    # Project Creator
-      "roles/securitycenter.admin",              # Security Center Admin
-      "roles/cloudsupport.admin"                 # Support Account Administrator
+      "roles/compute.xpnAdmin",               # Compute Shared VPC Admin
+      "roles/resourcemanager.folderAdmin",    # Folder Admin
+      "roles/resourcemanager.projectCreator", # Project Creator
+      "roles/securitycenter.admin",           # Security Center Admin
+      "roles/cloudsupport.admin"              # Support Account Administrator
     ]
 
     "gcp-customer-org-all-customer_viewers" = [
@@ -46,9 +46,9 @@ locals {
     "storage.publicAccessPrevention" = { rules = [{ enforce = true }] } # Enforces public access prevention on all buckets
     "gcp.detailedAuditLoggingMode"   = { rules = [{ enforce = true }] } # Enables detailed audit logging
     # "iam.managed.preventPrivilegedBasicRolesForDefaultServiceAccounts" = { rules = [{ enforce = true }] } # Prevents Owner/Editor/Viewer on default SAs
-    "container.managed.enableNetworkPolicy"     = { rules = [{ enforce = true }] } # Enforces Network Policy in GKE clusters #Requested entity already exists
+    "container.managed.enableNetworkPolicy" = { rules = [{ enforce = true }] } # Enforces Network Policy in GKE clusters #Requested entity already exists
     #"container.managed.enablePrivateNodes"      = { rules = [{ enforce = true }] } # Enforces Private Nodes in GKE clusters
-    "container.managed.enableSecretsEncryption" = { rules = [{ enforce = true }] } # Enforces app-layer secret encryption in GKE
+    "container.managed.enableSecretsEncryption" = { rules = [{ enforce = false }] } # Enforces app-layer secret encryption in GKE
     # "container.managed.enableWorkloadIdentityFederation"       = { rules = [{ enforce = true }] } # Enforces Workload Identity in GKE #Requested entity already exists 
     "run.managed.requireInvokerIam"                          = { rules = [{ enforce = true }] }  # Requires IAM for Cloud Run invoker role
     "compute.requireOsLogin"                                 = { rules = [{ enforce = true }] }  # Enforces OS Login for SSH access
@@ -58,7 +58,7 @@ locals {
     "compute.skipDefaultNetworkCreation"                     = { rules = [{ enforce = true }] }  # Skips creating the 'default' VPC network in new projects
     "cloudbuild.useComputeServiceAccount"                    = { rules = [{ enforce = false }] } # Do not allow to use Compute Engine SA for Cloud Build
     "cloudbuild.useBuildServiceAccount"                      = { rules = [{ enforce = false }] } # Do not allow to use Default Cloud Build SA
-    "container.managed.disallowDefaultComputeServiceAccount" = { rules = [{ enforce = true }] }  # Do not allow using Default Compute SA as a node pool SA
+    "container.managed.disallowDefaultComputeServiceAccount" = { rules = [{ enforce = false }] } # Do not allow using Default Compute SA as a node pool SA
     "pubsub.enforceInTransitRegions"                         = { rules = [{ enforce = true }] }  # Enforce in-transit regions for Pub/Sub
     # "container.managed.enableGoogleGroupsRBAC"                 = { rules = [{ enforce = true }] } # Require enabling Google Groups for RBAC in GKE #Requested entity already exists 
     # "container.managed.enableControlPlaneDNSOnlyAccess"        = { rules = [{ enforce = true }] } # Require using DNS-based endpoint in GKE #Requested entity already exists 
@@ -121,29 +121,31 @@ locals {
     # }
 
     #Restricts which services can be enabled.
-       "gcp.restrictServiceUsage" = {
-         rules = [{
-           allow = { values = [
-             "dns.googleapis.com",
-             "securitycenter.googleapis.com",
-             "osconfig.googleapis.com",
-             "run.googleapis.com",
-             "container.googleapis.com",
-             "sqladmin.googleapis.com",
-             "servicedirectory.googleapis.com",
-             "discoveryengine.googleapis.com",
-             "storage.googleapis.com",
-             "servicehealth.googleapis.com",
-             "compute.googleapis.com",
-             "connectors.googleapis.com",
-             "secretmanager.googleapis.com",
-             "accesscontextmanager.googleapis.com",
-             "billingbudgets.googleapis.com",
-             "vmmigration.googleapis.com"
+    "gcp.restrictServiceUsage" = {
+      rules = [{
+        allow = { values = [
+          "dns.googleapis.com",
+          "securitycenter.googleapis.com",
+          "osconfig.googleapis.com",
+          "run.googleapis.com",
+          "container.googleapis.com",
+          "sqladmin.googleapis.com",
+          "servicedirectory.googleapis.com",
+          "discoveryengine.googleapis.com",
+          "storage.googleapis.com",
+          "servicehealth.googleapis.com",
+          "compute.googleapis.com",
+          "connectors.googleapis.com",
+          "secretmanager.googleapis.com",
+          "accesscontextmanager.googleapis.com",
+          "billingbudgets.googleapis.com",
+          "vmmigration.googleapis.com",
+          "gkebackup.googleapis.com",
+          "cloudkms.googleapis.com"
 
-           ] }
-         }]
-       }
+        ] }
+      }]
+    }
 
     # # Restricts which physical locations can be used for resources.
     "gcp.resourceLocations" = {
@@ -211,8 +213,8 @@ locals {
   }
   organization_id = "organizations/${include.shared.locals.organization_id}"
   dynamic_custom_roles = {
-    IamManageDenyRole = {   # The role id to create for this role.
-      parents_roles = ["roles/resourcemanager.organizationAdmin","roles/owner"]
+    IamManageDenyRole = { # The role id to create for this role.
+      parents_roles = ["roles/resourcemanager.organizationAdmin", "roles/owner"]
       exclude_permissions = [
         "resourcemanager.organizations.createPolicyBinding",
         "resourcemanager.organizations.deletePolicyBinding",
@@ -295,9 +297,9 @@ locals {
         "storagetransfer.operations.report",
         "telcoautomation.edgeSlms.create"
       ]
-      role_title = "IamManageDenyRole"
-      role_description    = "This role is a combination of Owner and Organization Administrator roles, but without IAM and Org Policy management permissions"
-      attached_to = ["group:gcp-customer-org-all-customer_admins@cpva.gcp.vssa.lt"]
+      role_title       = "IamManageDenyRole"
+      role_description = "This role is a combination of Owner and Organization Administrator roles, but without IAM and Org Policy management permissions"
+      attached_to      = ["group:gcp-customer-org-all-customer_admins@cpva.gcp.vssa.lt"]
     }
   }
 }

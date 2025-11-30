@@ -49,7 +49,7 @@ Iš prieš tai sukurto terraform skripto (direktorija ```2_Terraform_Basics```) 
 1. Iš direktorijos ```2_Terraform_Basics``` ```main.tf``` failo:
     - Nukopijuokite visus ```provider``` blokus į ```3_Terraform_Modules\bucket_module\provider.tf``` failą.
     - Nukopijuokite visus `variable` blokus į ```3_Terraform_Modules\bucket_module\varialbes.tf``` failą.
-    - Nukopijuokite visus ```provider``` blokus į ```3_Terraform_Modules\bucket_module\provider.tf``` failą.
+    - Nukopijuokite visus ```resources``` blokus į ```3_Terraform_Modules\bucket_module\main.tf``` failą.
     - Nukopijuokite visus ```output``` blokus į ```3_Terraform_Modules\bucket_module\outputs.tf``` failą.      
 2. Peržiūrėkite ```3_Terraform_Modules\provider.tf``` failą. Atkreipkite į ```teraform``` bloką.
 3. Peržiūrėkite ```3_Terraform_Modules\variables.tf``` failą.
@@ -75,7 +75,7 @@ module "bucket" {
 6. Užpildykite ```3_Terraform_Modules\terraform.tfvars``` failą:
 - Project: ```aivaras-s-sandbox```
 - Region: ```europe-west3```
-- bucket_name: ```<vardas>_<pavarde>_<data be tarpų>```
+- bucket_name: ```<vardas>-<pavarde>-<data be tarpų>```
 - sa_name: ```<vardas>-<pavarde>```
 7. Paleiskite komandą ```terraform init```
 8. Paleiskite komandą ```terraform validate```

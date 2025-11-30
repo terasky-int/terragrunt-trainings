@@ -6,7 +6,7 @@ variable "project" {
 variable "region" {
   description = "The region"
   type        = string
-  default    = "europe-west4"
+  default     = "europe-west4"
 }
 
 variable "bucket_name" {
@@ -17,7 +17,7 @@ variable "bucket_name" {
 variable "bucket_location" {
   description = "GCS bucket location"
   type        = string
-  default    = "europe-west4"
+  default     = "europe-west4"
 }
 
 variable "sa_name" {
