@@ -1,0 +1,8 @@
+region: "europe-west4"
+region_trigram: "euw4"
+location: "europe-west4"
+project: "gc-prj-cst-prod-demo"
+project_id: "gc-prj-cst-prod-demo"
+client_name: "cst"
+vpc: "https://www.googleapis.com/compute/v1/projects/gc-prj-cst-infra-networking/global/networks/gc-vpc-global-cst-infra-prod-01"
+subnet: "https://www.googleapis.com/compute/v1/projects/gc-prj-cst-infra-networking/regions/europe-west4/subnetworks/gc-sub-euw4-cst-infra-prod-01"

@@ -24,7 +24,8 @@ inputs = {
     "billingbudgets.googleapis.com",
     "orgpolicy.googleapis.com",
     "networkconnectivity.googleapis.com",
-    "logging.googleapis.com"
+    "logging.googleapis.com",
+    "container.googleapis.com"
 
   ]
   iam                   = {}

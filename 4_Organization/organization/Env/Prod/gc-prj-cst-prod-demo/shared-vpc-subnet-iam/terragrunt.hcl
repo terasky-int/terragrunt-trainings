@@ -1,5 +1,5 @@
 terraform {
-  source = "github.com/terasky-int/tsb-tf-modules.git//checked-modules/subnet-policy"
+  source = "github.com/terasky-int/training-modules.git//modules/subnet-policy"
 }
 
 include "shared" {
@@ -42,6 +42,18 @@ inputs = {
       region     = include.shared.locals.region
       role       = "roles/compute.networkUser"
       member     = "serviceAccount:${dependency.project.outputs.number}-compute@developer.gserviceaccount.com"
+    },
+    "cloud-run-service-account" = {
+      subnetwork = "${include.shared.locals.prefix}sub-${include.shared.locals.region_trigram}-${include.shared.locals.client_name}-${local.folder}-${local.env}-01"
+      region     = include.shared.locals.region
+      role       = "roles/compute.networkUser"
+      member     = "serviceAccount:service-${dependency.project.outputs.number}@serverless-robot-prod.iam.gserviceaccount.com"
+    },
+    "gke-service-account" = {
+      subnetwork = "${include.shared.locals.prefix}sub-${include.shared.locals.region_trigram}-${include.shared.locals.client_name}-${local.folder}-${local.env}-01"
+      region     = include.shared.locals.region
+      role       = "roles/compute.networkUser"
+      member     = "serviceAccount:${dependency.project.outputs.number}@cloudservices.gserviceaccount.com"
     }
   }
 }

@@ -48,7 +48,7 @@ locals {
     # "iam.managed.preventPrivilegedBasicRolesForDefaultServiceAccounts" = { rules = [{ enforce = true }] } # Prevents Owner/Editor/Viewer on default SAs
     "container.managed.enableNetworkPolicy"     = { rules = [{ enforce = true }] } # Enforces Network Policy in GKE clusters #Requested entity already exists
     #"container.managed.enablePrivateNodes"      = { rules = [{ enforce = true }] } # Enforces Private Nodes in GKE clusters
-    "container.managed.enableSecretsEncryption" = { rules = [{ enforce = true }] } # Enforces app-layer secret encryption in GKE
+    "container.managed.enableSecretsEncryption" = { rules = [{ enforce = false }] } # Enforces app-layer secret encryption in GKE
     # "container.managed.enableWorkloadIdentityFederation"       = { rules = [{ enforce = true }] } # Enforces Workload Identity in GKE #Requested entity already exists 
     "run.managed.requireInvokerIam"                          = { rules = [{ enforce = true }] }  # Requires IAM for Cloud Run invoker role
     "compute.requireOsLogin"                                 = { rules = [{ enforce = true }] }  # Enforces OS Login for SSH access
@@ -58,7 +58,7 @@ locals {
     "compute.skipDefaultNetworkCreation"                     = { rules = [{ enforce = true }] }  # Skips creating the 'default' VPC network in new projects
     "cloudbuild.useComputeServiceAccount"                    = { rules = [{ enforce = false }] } # Do not allow to use Compute Engine SA for Cloud Build
     "cloudbuild.useBuildServiceAccount"                      = { rules = [{ enforce = false }] } # Do not allow to use Default Cloud Build SA
-    "container.managed.disallowDefaultComputeServiceAccount" = { rules = [{ enforce = true }] }  # Do not allow using Default Compute SA as a node pool SA
+    "container.managed.disallowDefaultComputeServiceAccount" = { rules = [{ enforce = false }] }  # Do not allow using Default Compute SA as a node pool SA
     "pubsub.enforceInTransitRegions"                         = { rules = [{ enforce = true }] }  # Enforce in-transit regions for Pub/Sub
     # "container.managed.enableGoogleGroupsRBAC"                 = { rules = [{ enforce = true }] } # Require enabling Google Groups for RBAC in GKE #Requested entity already exists 
     # "container.managed.enableControlPlaneDNSOnlyAccess"        = { rules = [{ enforce = true }] } # Require using DNS-based endpoint in GKE #Requested entity already exists 
@@ -139,7 +139,9 @@ locals {
              "secretmanager.googleapis.com",
              "accesscontextmanager.googleapis.com",
              "billingbudgets.googleapis.com",
-             "vmmigration.googleapis.com"
+             "vmmigration.googleapis.com",
+             "gkebackup.googleapis.com",
+             "cloudkms.googleapis.com"
 
            ] }
          }]

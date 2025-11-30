@@ -33,9 +33,13 @@ inputs = {
   subnets = [
     {
       name          = "${include.shared.locals.prefix}sub-${local.glb_name_region}-01"
-      ip_cidr_range = "10.207.255.128/27"
+      ip_cidr_range = "10.207.255.0/24"
       region        = include.shared.locals.region # europe-west3
       description   = ""
+      secondary_ip_ranges = {
+        "${include.shared.locals.prefix}sub-${local.glb_name_region}-01-pods"     = "10.136.128.0/17"
+        "${include.shared.locals.prefix}sub-${local.glb_name_region}-01-svc" = "10.136.16.0/20"
+      }
     },
   ]
   shared_vpc_host = true
