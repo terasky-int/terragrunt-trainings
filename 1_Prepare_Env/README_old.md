@@ -1,0 +1,194 @@
+
+## **📋 Reikalavimai**
+
+* „Windows 10“ arba „Windows 11“
+* „macOS“ kompiuteris su interneto prieiga.
+* Administratoriaus teisės
+
+---
+# **Windows paruošimas**
+## **1\. „Git“ diegimas**
+
+1. Apsilankykite [oficialioje „Git“ svetainėje](https://git-scm.com/download/win).  
+2. Atsisiųskite **64-bit Git for Windows Setup**.  
+3. Paleiskite diegimo failą.  
+4. **Pastaba:** Dažniausiai galite priimti visus numatytuosius nustatymus spausdami „Next“ (Toliau) per visą diegimo vedlį.
+
+---
+
+## **2\. Failų katalogo paruošimas („Terraform“ ir „Terragrunt“)**
+
+Kadangi „Terraform“ ir „Terragrunt“ platinami kaip pavieniai failai, sukursime jiems skirtą vietą.
+
+1. Atidarykite „File Explorer“.  
+2. Dabalaukyje sukurkite aplanką pavadinimu "mokymai".  
+   * **Kelias:** C:\\Users\\<<"user name">>\\Desktop\\moykymai
+
+## **3. Mokymų repositorijos klonavimas**
+
+1. Atsidarykite Terminal (Lango mygtukas -> Terminal)
+2. Suveskite komandą:
+```cd .\Desktop\mokymai\```
+3. Nusiklonuokite repositoriją:
+```git clone https://github.com/terasky-int/terragrunt-trainings.git``` 
+
+
+## **4\. Sistemos aplinkos kintamųjų konfigūravimas (Environment Variables)**
+
+Kad „Windows“ atpažintų terraform ir terragrunt komandas bet kuriame terminalo lange, turite pridėti sukurtą aplanką į sistemos „Path“ kintamąjį.
+
+1. Paspauskite **Windows klavišą** ir įveskite env.  
+2. Pasirinkite **Edit the system environment variables** (Redaguoti sistemos aplinkos kintamuosius).  
+3. Spustelėkite mygtuką **Environment Variables...** lango apačioje.  
+4. Skiltyje **System variables** (apatinis langas) raskite kintamąjį **Path**, pažymėkite jį ir spustelėkite **Edit** (Redaguoti).  
+5. Spustelėkite **New** (Naujas).  
+6. Įveskite aplanko kelią: C:\\Users\\<<"user name">>\\Desktop\\moykymai\\terragrunt-trainings\\1_Prepare_Env.  
+7. Spustelėkite **OK** visuose trijuose languose, kad išsaugotumėte pakeitimus ir uždarytumėte langus.
+
+## **5\. Gcloud CLI diegimas**
+
+1. Atsidarome direktoriją
+```Desktop\mokymai\terragrunt-trainings\1_Prepare_Env```
+2. Du kartus paspaudžiame ant ```GoogleCloudSDKInstaller.exe```
+3. Atsidariusiame lange spaudžiame keletą kartų ```Next``` iki lango ```Select components to install```. Pažymime ```Cloud Tools for PowerShell```. Spaudžiame ```Install```.
+4. ```Next``` ir ```Finish```.
+
+## **6\. Visual Studio Code diegimas**
+
+1. Atsidarome naršyklėje
+```https://code/visualstudion.com/download```
+2. Pasirenkame ```Windows```.
+3. Atsidarome atsiūstą failą.
+4. Pora kartų spaudžiame ```Next```ir ```Install```.
+5. Baigusis diegimui, spaudžiame ```Finish```.
+
+
+## **7\. Patikrinimas**
+
+**Svarbu:** Turite uždaryti visus atidarytus terminalo langus ir atidaryti **naują** „PowerShell“ arba „Command Prompt“ langą, kad „Path“ pakeitimai įsigaliotų.
+
+Norėdami patikrinti, ar įrankiai veikia, paleiskite šias komandas:
+
+```
+# Patikrinti Git  
+git \-\-version```
+
+# Patikrinti Terraform  
+terraform \-v
+
+# Patikrinti Terragrunt  
+terragrunt \-v
+
+# Patikrinti Google Cloud SDK  
+gcloud \-v
+```
+
+## **6\. Inicializavimas**
+
+Kai patikrinimas sėkmingas, inicijuokite „Google Cloud CLI“:
+```
+gcloud init
+```
+
+Ši komanda atidarys naršyklę, kurioje turėsite prisijungti prie savo „Google“ paskyros ir pasirinkti GCP projektą.
+
+---
+
+# **MacOS paruošimas**
+
+## **1\. Homebrew įdiegimas**
+
+„Homebrew“ yra „macOS“ paketų tvarkyklė, kuri leis įdiegti visus kitus įrankius viena komanda.
+
+1. Atidarykite **Terminal** programą (paspauskite Cmd \+ Space ir įveskite „Terminal“).  
+2. Nukopijuokite ir įklijuokite šią komandą, tada paspauskite Enter:
+
+```
+/bin/bash \-c "$(curl \-fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+````
+
+**Pastaba:** Diegimo metu terminalas gali paprašyti įvesti kompiuterio slaptažodį ir paspausti Enter patvirtinimui. Įvedant slaptažodį simboliai ekrane nesimatys – tai normalu.
+
+3. Baigus diegimą, terminale gali pasirodyti instrukcija su komandomis (pvz., echo 'eval...), kurias reikia įvykdyti, kad „Homebrew“ būtų įtrauktas į jūsų „Path“. Įvykdykite jas, jei sistema to prašo.
+
+---
+
+## **2\. Git įdiegimas**
+
+Nors „macOS“ dažnai turi senesnę „Git“ versiją, rekomenduojama įdiegti naujausią per „Homebrew“.
+
+1. Terminale įveskite:
+
+```brew install git```
+
+2. Patikrinkite versiją:
+
+```git --version```
+
+---
+
+## **3\. Visual Studio Code (VS Code) įdiegimas**
+
+Tai yra pagrindinis kodo redaktorius. Diegsime jį per „Homebrew Cask“ (skirta grafinėms programoms).
+
+1. Terminale įveskite:
+
+```brew install --cask visual-studio-code```
+
+2. Norėdami atidaryti redaktorių, programų sąraše ieškokite „Visual Studio Code“.
+
+---
+
+## **4\. Terraform ir Terragrunt įdiegimas**
+
+„Terraform“ naudojamas infrastruktūrai aprašyti, o „Terragrunt“ padeda valdyti „Terraform“ konfigūracijas (DRY principas).
+
+1. Įdiekite „Terraform“ (naudojant oficialų „HashiCorp“ šaltinį):
+```
+brew tap hashicorp/tap  
+brew install hashicorp/tap/terraform
+```
+2. Įdiekite „Terragrunt“:
+
+
+```
+brew install terragrunt
+```
+3. Patikrinkite versijas:
+
+```
+terraform --version  
+terragrunt --version
+```
+---
+
+## **5\. Google Cloud SDK (gcloud) įdiegimas**
+
+Tai komandinės eilutės įrankiai, skirti valdyti „Google Cloud“ resursus.
+
+1. Įdiekite SDK paketą:
+```
+brew install --cask google-cloud-sdk
+```
+2. **Svarbu:** Kad komandos veiktų, gali tekti pridėti gcloud į savo aplinkos kintamuosius, jei to nepadarė instaliacija. Dažniausiai pakanka tiesiog **perkrauti terminalą** (uždaryti ir atidaryti iš naujo).  
+3. Inicijuokite prisijungimą:
+```
+gcloud init
+```
+*Sekite instrukcijas ekrane, kad prisijungtumėte prie savo „Google“ paskyros ir pasirinktumėte projektą.*
+
+---
+
+## **6\. Patikrinimas (Verification)**
+
+Norėdami įsitikinti, kad viskas veikia, terminale paeiliui įveskite šias komandas. Jūs neturėtumėte gauti klaidų pranešimų („command not found“).
+
+| Įrankis | Komanda patikrinimui | Tikėtinas rezultatas |
+| :---- | :---- | :---- |
+| **Git** | git \--version | git version 2.x.x |
+| **Terraform** | terraform \--version | Terraform v1.x.x |
+| **Terragrunt** | terragrunt \--version | terragrunt version v0.x.x |
+| **Gcloud** | gcloud \--version | Google Cloud SDK x.x.x |
+| **VS Code** | code \--version | Versijos numeris |
+
+---
