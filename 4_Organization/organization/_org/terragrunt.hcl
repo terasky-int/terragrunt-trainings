@@ -319,7 +319,7 @@ EOF
 
 terraform {
   #  source = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/organization?ref=v40.2.0"
-  source = "github.com/terasky-int/tsb-tf-modules.git//checked-modules/organization"
+  source = "github.com/terasky-int/training-modules.git//modules/organization"
 }
 
 # Include common configuration
