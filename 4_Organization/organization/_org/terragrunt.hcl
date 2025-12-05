@@ -298,7 +298,7 @@ locals {
       ]
       role_title       = "IamManageDenyRole"
       role_description = "This role is a combination of Owner and Organization Administrator roles, but without IAM and Org Policy management permissions"
-      attached_to      = ["group:gcp-customer-org-all-customer_admins@cpva.gcp.vssa.lt"]
+      attached_to      = ["group:gcp-customer-org-all-customer_admins@${include.shared.locals.organization_domain}"]
     }
   }
 }
