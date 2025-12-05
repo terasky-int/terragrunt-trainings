@@ -104,7 +104,6 @@ locals {
         { deny = { all = true } },
       ]
     }
-
     # Disable use of Shared reservations
 
     "compute.sharedReservationsOwnerProjects" = {
