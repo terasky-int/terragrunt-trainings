@@ -58,7 +58,8 @@ inputs = {
   bootstrap_folder_name            = "Bootstrap" # Custom name for bootstrap folder
   bucket_force_destroy             = false
   bucket_tfstate_kms_force_destroy = false
-  project_deletion_policy          = "PREVENT"
+  project_deletion_policy          = "DELETE" #Default is PREVENT, but for demo purposes we will change to DELETE, due to simplicity of Cleanup
+
   folder_deletion_protection       = true
 
   # Additional project creators (if needed)
