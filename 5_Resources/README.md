@@ -134,7 +134,7 @@ Patikrinkite gautus *output*.
 Virtualios mašinos resursų kūrimo vietoje (`5_Resources/client-resources/vm`) atidarykite `terragrunt.hcl` ir peržiūrėkite/atlikite pakeitimus:
 
   * `dependency "service_account"` blokas:
-      * `config_path` - Čia mums reikia nurodyti service account resurso priklausomybę. Nurodome `../service-account`.
+      * `config_path` - Čia mums reikia nurodyti service account resurso priklausomybę. Nurodome `..\\service-account`.
   * `inputs` blokas:
       * `name` - Virtualios mašinos vardas, gale pridėkite papildomai VM paskirtį. Pvz.: `"${include.shared.inputs.prefix}-vm-${include.shared.inputs.glb_name}-web"`.
       * `zone` - Kurioje zonoje bus paleista virtuali mašina. *europe-west4* turi a, b, c zonas. Pasirinkti vieną ir nurodyti formate: `"${include.shared.inputs.region}-a"`.

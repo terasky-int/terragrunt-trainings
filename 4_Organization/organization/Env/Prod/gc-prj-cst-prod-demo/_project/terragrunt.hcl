@@ -36,7 +36,7 @@ inputs = {
     "run.managed.requireInvokerIam" = { rules = [{ enforce = false }] } # Requires IAM for Cloud Run invoker role
     # "iam.allowedPolicyMemberDomains" = {                                # Requested entity already exists
     #   rules = [{
-    #     allow_all = "TRUE"
+    #     allow = { all = true}
     #   }]
     # }
   }
