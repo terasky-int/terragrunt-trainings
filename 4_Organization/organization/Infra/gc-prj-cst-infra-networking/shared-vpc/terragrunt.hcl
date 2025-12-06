@@ -18,8 +18,8 @@ dependency "project" {
 locals {
   folder          = "infra"
   env             = "prod"
-  glb_name        = "global-${local.client_name}-${local.folder}-${local.env}"
-  glb_name_region = "${local.region_trigram}-${local.client_name}-${local.folder}-${local.env}"
+  glb_name        = "global-${include.shared.locals.client_name}-${local.folder}-${local.env}"
+  glb_name_region = "${include.shared.locals.region_trigram}-${include.shared.locals.client_name}-${local.folder}-${local.env}"
   vpc_name        = "${include.shared.locals.prefix}vpc-${local.glb_name}-01"
   #shared_vpc_service_projects = [""]
 }

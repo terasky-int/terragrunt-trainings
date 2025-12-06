@@ -280,6 +280,7 @@ locals {
         "iam.principalaccessboundarypolicies.delete",
         "iam.principalaccessboundarypolicies.unbind",
         "iam.principalaccessboundarypolicies.update",
+        "mcp.tools.call",
         "orgpolicy.customConstraints.create",
         "orgpolicy.customConstraints.delete",
         "orgpolicy.customConstraints.update",

@@ -4,7 +4,7 @@ include "shared" {
 }
 
 terraform {
-  source = "github.com/GoogleCloudPlatform/cloud-foundation-fabric//modules/project?ref=v40.2.0"
+  source = "github.com/terasky-int/training-modules.git//modules/project"
 }
 
 dependency "folder" {

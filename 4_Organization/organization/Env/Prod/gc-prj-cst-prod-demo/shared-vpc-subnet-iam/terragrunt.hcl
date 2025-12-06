@@ -22,7 +22,7 @@ dependency "network_project" {
 }
 
 dependency "shared_vpc" {
-  config_path = "../../../../Infra/gc-prj-cpva-infra-networking/shared-vpc"
+  config_path = "../../../../Infra/gc-prj-cst-infra-networking/shared-vpc"
 }
 
 locals {
