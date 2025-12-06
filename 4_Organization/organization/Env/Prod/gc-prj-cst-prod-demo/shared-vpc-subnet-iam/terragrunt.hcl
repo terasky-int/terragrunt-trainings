@@ -1,5 +1,5 @@
 terraform {
-  source = "github.com/terasky-int/tsb-tf-modules.git//checked-modules/subnet-policy"
+  source = "github.com/terasky-int/training-modules.git//modules/subnet-policy"
 }
 
 include "shared" {
