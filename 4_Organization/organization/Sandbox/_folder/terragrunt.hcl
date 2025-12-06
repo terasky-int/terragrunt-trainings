@@ -5,7 +5,7 @@ include "shared" {
 
 
 terraform {
-  source = "github.com/terasky-int/training-modules.git//modules/organization"
+  source = "github.com/terasky-int/training-modules.git//modules/folder"
 }
 
 dependencies {

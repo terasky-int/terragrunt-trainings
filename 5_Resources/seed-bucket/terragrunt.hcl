@@ -1,5 +1,5 @@
 terraform {
-  source = "github.com/terasky-int/training-modules.git//checked-modules/bucket"
+  source = "github.com/terasky-int/training-modules.git//modules/bucket"
 }
 
 include "shared" {
