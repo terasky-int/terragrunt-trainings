@@ -1,14 +1,14 @@
 ## Praktinės dalies eiga
 
 1.  Sukursime *bucket'ą* klientui talpinti terraform/terragrunt *state*.
-2.  Kliento rolėje:
-    2.1. Susikonfigūruosime aplinką, kad galėtumėm diegtis resursus.
-    2.2. Susikursime *Service Account'ą* Compute Engine virtualiai mašinai.
-    2.3. Susikursime Virtualią mašiną su sukurtu *Service Account'u* ir prijungsime prie VPC.
-    2.4. Susikursime Cloud SQL duomenų bazę ir ją prijungsime prie VPC.
-    2.5. Susikursime Cloud Run deploymentą.
-    2.6. Susikursime Application Load Balancer'į.
-    2.7. Susikursime GKE klasterį.
+2.  Kliento rolėje:   
+    2.1. Susikonfigūruosime aplinką, kad galėtumėm diegtis resursus.   
+    2.2. Susikursime *Service Account'ą* Compute Engine virtualiai mašinai.   
+    2.3. Susikursime Virtualią mašiną su sukurtu *Service Account'u* ir prijungsime prie VPC.   
+    2.4. Susikursime Cloud SQL duomenų bazę ir ją prijungsime prie VPC.   
+    2.5. Susikursime Cloud Run deploymentą.   
+    2.6. Susikursime Application Load Balancer'į.   
+    2.7. Susikursime GKE klasterį.   
 
 ## Bucket (5\_Resources/seed-bucket)
 
