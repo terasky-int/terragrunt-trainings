@@ -146,7 +146,6 @@ Virtualios mašinos resursų kūrimo vietoje (`5_Resources/client-resources/vm`)
       * `boot_disk` blokas:
           * `size` - VM boot disko dydis. Pakeiskite į `20`.
 
-**Papildomai:** Jei norite, galite užkomentuoti `shielded_config` bloką ir bandyti paleisti virtualią mašiną. Taip pamatysite, kaip veikia Organizacijos politikos – neleis paleisti VM.
 
 ### **Diegimo žingsniai**
 
